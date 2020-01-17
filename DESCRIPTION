@@ -1,0 +1,12 @@
+Package: metaboCombineR
+Type: Package
+Title: What the Package Does in One 'Title Case' Line
+Version: 4.0
+Date: 2018-08-01
+Author: Your Name
+Maintainer: Your Name <your@email.com>
+Description: One paragraph description of what the package does as one or more full sentences.
+License: GPL (>= 2)
+Depends: stats, methods, utils, graphics, grDevices
+Imports: methods, Rcpp (>= 0.12.16), RInside, utils
+LinkingTo: Rcpp, RInside
