@@ -1,12 +1,16 @@
 Package: metaboCombineR
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
-Version: 4.0
-Date: 2018-08-01
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or more full sentences.
+Title: metaboCombineR: A package for aligning LC/MS studies 
+Version: 0.99.0
+Date: 2020-01-20
+Author: Frantisek Malinka
+Maintainer: Frantisek Malinka <frantisek.malinka@gmail.com>
+Description: This package handles with elution order and retention time swaps in large-scale multi-batch untargeted LS/MS studie.
 License: GPL (>= 2)
 Depends: stats, methods, utils, graphics, grDevices
-Imports: methods, Rcpp (>= 0.12.16), RInside, utils
+Imports: Rcpp (>= 0.12.16), RInside
 LinkingTo: Rcpp, RInside
+Suggests: BiocStyle, knitr, rmarkdown
+VignetteBuilder: knitr
+BugReports: https://github.com/fMalinka/metabocombiner/issues/new
+URL: https://github.com/fMalinka/metabocombiner

@@ -1,0 +1,269 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r find elution order swapping in alignment, echo=FALSE}
+
+
+sortMzByRt <- function(data)
+{
+  mzs <- trunc(as.numeric(regmatches(rownames(data), regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*100)/100
+  rts <- as.numeric(substring(regmatches(rownames(data), regexpr("T\\d+(\\.\\d+)?",rownames(data), perl=TRUE)),2))
+  
+  rtsOrder <- order(rts)
+  newdata <- data[rtsOrder,]
+  newdata <- cbind(newdata, RT= rts[rtsOrder])
+  newdata <- cbind(newdata, MZ= mzs[rtsOrder])
+  return(as.matrix(newdata))
+}
+
+
+
+#check elution order - zarovnani mezi mzb1 a mzb2
+mydata <- read.csv("../experiments/mymatrix_2_monointerpolator.csv")
+
+rt <- mydata$RT
+mz <- mydata$MZ
+gap <- mydata$GAP
+
+
+elutionOrder <- vector()
+elutionNum <- vector()
+elutioNumZero <- vector()
+elutionIndex <- vector()
+elutionRT <- vector()
+
+binSize <- 10
+
+for(i in 1:length(rt))
+{
+  if(!is.na(rt[i]))
+  {
+    rt[rt[i:length(rt)] < rt[i]+binSize]
+    id <- i + which(rt[i:length(rt)] < rt[i]+binSize)
+    elutionID <- i + which(mz[id] == mz[i])
+    if(length(elutionID) > 0)
+    {
+      elutionOrder <- append(elutionOrder, mz[i])
+      elutionRT <- append(elutionRT, rt[i])
+      elutionNum <- append(elutionNum, length(elutionID))
+      elutionIndex <- append(elutionIndex, i)
+      elutioNumZero <- append(elutioNumZero, sum(gap[i:elutionID] == 0))
+      rt[elutionID] <- NA
+      mz[elutionID] <- NA
+    }
+    
+  }
+}
+```
+
+```{r load sample 1, echo=FALSE}
+
+#MZB1
+mzb1 <- read.csv("/home/frantisek/BIOCEV/metaboDatasets/mzb1_parts/mzb1_wnorm_1.csv", row.names = 1, stringsAsFactors = FALSE)
+
+mzb1 <- mzb1[-1,]
+mzb1_1 <- apply(mzb1, 2, as.numeric)
+rownames(mzb1_1) <- rownames(mzb1)
+mzb1 <- mzb1_1
+
+mzb1sort <- sortMzByRt(mzb1)
+rt1 <- mzb1sort[, "RT"]
+
+#MZB2
+mzb2 <- read.csv("/home/frantisek/BIOCEV/metaboDatasets/mzb1_parts/mzb1_wnorm_2.csv", row.names = 1, stringsAsFactors = FALSE)
+
+mzb2 <- mzb2[-1,]
+mzb2_2 <- apply(mzb2, 2, as.numeric)
+rownames(mzb2_2) <- rownames(mzb2)
+mzb2 <- mzb2_2
+
+mzb2sort <- sortMzByRt(mzb2)
+rt2 <- mzb2sort[, "RT"]
+
+
+
+#a <- hist(rt1, breaks = seq(trunc(min(rt1)), trunc(max(rt1))+1, length.out = 4000))
+
+
+```
+
+##Popis experimentu
+Úkolem exprimentu v již zarovnaném souboru (tento soubor je výstupem našeho algoritmu) je nalézt tzv. elution order swapping.
+Elution order swapping (EOS) může být způsoben úrovni:
+experimentu,
+zpracování (při redukci peaku na features -> celý signal redukuji na dvě hodnoty: rt a mz)
+
+Chci se přesvědčit v tom, že čím blíže jsem dané peaky u sebe (na úrovni RT), tím je větší pst, že zde dojde k elution order swapping.
+
+Počet peaků ve vzorku1
+```{r}
+nrow(mzb1)
+```
+
+Počet peaků ve finálním alignmentu
+```{r}
+nrow(mydata)
+```
+
+Počet elution order swapping ve finálním alignmentu
+```{r}
+length(elutionRT)
+```
+
+NOTE: zatím není úplně jasné, co ještě považovat za elution order swapping a co je prostě už jiné mzs. Pro zjednodušení zatím uvažuji, že elution order swapping je takový peak v jehož rozsahu 10 sekund najdu peak, který odporuje pořadí. (Nutno zkontrolovat).
+
+Mz hodnoty elution order swapping ve finálním alignmentu
+```{r}
+elutionOrder
+```
+
+RT hodnoty elution order swapping ve finálním alignmentu
+```{r}
+elutionRT
+```
+
+
+Nejjednodušší způsob jak prověřit závislost mezi množtstvím peaků a počtem elution order swapping může být nasledující: rozdělím časovou osu RT na jednotlivé biny a budu počítat kolik peaků mně do konkrétního binu padne, to stejné udělám i pro detekované elution order swapping tj. budu si pamatovat počet elution order swapping pro konkrétní biny.
+
+
+###Bin bude velký 1s
+
+```{r, echo=FALSE}
+bin <- seq(trunc(min(rt1)), trunc(max(rt1))+1)
+```
+
+```{r}
+head(bin)
+```
+
+Histogram - počet peaků v jednotlivých binech
+```{r}
+orig_h <- hist(rt1, breaks = bin)
+```
+
+Histogram - počet elution order swapping v jednotlivých binech
+
+```{r}
+multi_h <- hist(elutionRT, breaks = bin)
+```
+
+Jak si můžeme všimnout, jednotlivé hidstogramy jsou si vcelku podobné. Očekávám silnou korelaci mezi počtem peaků v binu a počtem elution order swapping.
+```{r}
+cor(orig_h$counts, multi_h$counts)
+```
+
+####Jak je vidět korelace je velmi silná. Lze teda říct, že čím jsou peaky blíž u sebe, tím častěji dochází k elution order swapping (pro bin 1sekunda).
+
+
+###Bin bude velký 2s
+
+```{r, echo=FALSE}
+bin <- seq(trunc(min(elutionRT)), trunc(max(elutionRT))+6, by = 2)
+```
+
+```{r}
+head(bin)
+```
+
+Histogram - počet peaků v jednotlivých binech
+```{r}
+orig_h <- hist(rt1, breaks = bin)
+```
+
+Histogram - počet elution order swapping v jednotlivých binech
+
+```{r}
+multi_h <- hist(elutionRT, breaks = bin)
+```
+
+Jak si můžeme všimnout, jednotlivé hidstogramy jsou si vcelku podobné. Očekávám silnou korelaci mezi počtem peaků v binu a počtem elution order swapping.
+```{r}
+cor(orig_h$counts, multi_h$counts)
+```
+
+
+###Vzdálenost mezi peaky
+Zde budu zjišťovat vzdálenost na ose RT mezi jednotlivými peaky. Pro konkrétní peak budu hledat dva nejbližší peaky na ose RT a z nich vyberu minimální vzdálenost. Chci totiž najít co nejvíce osamocené peaky, tj. maximalizuji minimální vzdálenost mezi dvěma sousedy. Počítáno pro mzb1.
+
+####MZB1
+
+```{r}
+mzb1_dist <- dist(rt1)
+mzb1_dist_matrix <- as.matrix(mzb1_dist)
+pointDisc <- rep(0, nrow(mzb1_dist_matrix))
+for(i in 2:(nrow(mzb1_dist_matrix)-1))
+{
+  pointDisc[i] <- min(mzb1_dist_matrix[i,c(i-1, i+1)])
+}
+pointDisc
+```
+
+Grafický výstup, osa x je RT a y je minimální vzdálenost mezi dvěma sousedy. Snažíme se tedy najít vhodný práh, kde bychom mohli označit peaky za málo/vysoce pravděpodné, že dojde k elution order swap.
+
+```{r}
+plot(rt1, pointDisc, cex = 0.5, pch=20)
+```
+
+Původní histogram
+```{r}
+hist(pointDisc)
+```
+
+Histofgram se zlogaritmovanými daty
+```{r}
+hist(log(pointDisc))
+```
+
+Zde není úplně jasné jaké peaky označit za outliery (nepravděpdobné že dojde k EOS). Zajímavá je ale myšlenka, že bychom zohlednili i intezitu, protože předpokládáme, že peak s vyšší intenzitou bude šiřší. Pozn. my teď pracujeme s profilem (jeden bod), předtím ale data určitě vykazovala tvar spíše Gaussovské křivky, proto lze usuzovat, že peak s vyšší intenzitou je "širší" a tím může být i pravděpdobnější překryv s nějakým jiným.
+
+####MZb2
+```{r}
+mzb2_dist <- dist(rt2)
+mzb2_dist_matrix <- as.matrix(mzb2_dist)
+pointDisc2 <- rep(0, nrow(mzb2_dist_matrix))
+for(i in 2:(nrow(mzb2_dist_matrix)-1))
+{
+  pointDisc2[i] <- min(mzb2_dist_matrix[i,c(i-1, i+1)])
+}
+pointDisc2
+```
+
+```{r}
+plot(rt2, pointDisc2, cex = 0.5, pch=20)
+```
+Původní histogram
+```{r}
+hist(pointDisc2)
+```
+
+Histofgram se zlogaritmovanými daty
+```{r}
+hist(log(pointDisc2))
+```
+
+Nyní si z experimentu mzb1 a mzb2 zkusím najít společný vyskyt peaků, u kterých by nemuselo hrozit EOS
+
+```{r}
+myRTth <- 1
+length(mzb1sort[pointDisc > myRTth, "MZ"])
+length(mzb2sort[pointDisc2 > myRTth, "MZ"])
+length(intersect(mzb1sort[pointDisc > myRTth, "MZ"], mzb2sort[pointDisc2 > myRTth, "MZ"]))
+nonEOS <- intersect(mzb1sort[pointDisc > myRTth, "MZ"], mzb2sort[pointDisc2 > myRTth, "MZ"])
+nonEOS
+#ktere jsou dostatecne daleko, ale doslo u nich k EOS u referencniho alignmentu
+nonEOS[intersect(mzb1sort[pointDisc > myRTth, "MZ"], mzb2sort[pointDisc2 > myRTth, "MZ"]) %in% elutionOrder]
+```
+
+
+#----------------------------------------------
+
+Nyní se pokusím najít nějakého pěkného reprezentanta EOS, který by nebyl způsoben předzpracováním.
+mzb1: M239.11147T1044.45312, M296.22235T1045.59748, M260.22163T1047.08681
+mzb2: M260.22152T1044.97446, M239.11131T1046.62299
+
+
+
