@@ -31,6 +31,11 @@ Look at our readme file at
 \url{https://github.com/fMalinka/metaboCombiner}
 }
 \examples{
-myExample <- runMetaboCombiner()
+data(metaboExp1)
+data(metaboExp2)
+data(metaboExp3)
+data(metaboExp4)
+runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4),
+mzprecision=3)
 }
 \author{Frantisek Malinka}

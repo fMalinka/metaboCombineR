@@ -1,3 +1,6 @@
 useDynLib(metaboCombineR, .registration=TRUE)
 import(methods, Rcpp, RInside)
 export("runMetaboCombiner")
+export("getRTs")
+export("getMZs")
+export("sortDataFrameByRt")

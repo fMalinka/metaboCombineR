@@ -13,9 +13,9 @@ void printMatrix(double *matrix, int nrow, int ncol)
     for(int x = 0; x < nrow*ncol; ++x)
     {
         if(x % ncol ==0)
-            std::cout << std::endl;
+            Rcpp::Rcout << std::endl;
 
-            std::cout << matrix[x] <<",";
+            Rcpp::Rcout << matrix[x] <<",";
 
     }
 }
@@ -163,8 +163,8 @@ std::vector<mySolutionShort> makeCombinations(unsigned long actRow, mySolutionSh
         }
 
 
-        //std::cout << "actual: " << **myactsol.src.it_profile_mz << std::endl;
-        //std::cout << "actual2: " << **myactsol.src.profile_mz.begin() << std::endl;
+        //Rcpp::Rcout << "actual: " << **myactsol.src.it_profile_mz << std::endl;
+        //Rcpp::Rcout << "actual2: " << **myactsol.src.profile_mz.begin() << std::endl;
 
         //++myactsol.src.it_profile_mz;
         myactsol.src.orderPenalty.push_back(0);
@@ -196,7 +196,7 @@ std::vector<mySolutionShort> makeCombinations(unsigned long actRow, mySolutionSh
 
             signed long swapIndex = actRow+1 - indSwap -1;//srcprofileVect.size() - indSwap -1;
             //-1 protoze chci davat novy prvek prek begin()
-            //std::cout << "test: " << **it << std::endl;
+            //Rcpp::Rcout << "test: " << **it << std::endl;
             if(swapIndex == -1 || commonSeqs->count(**it))
             {
                 myactsol.src.profile_mz.insert(it, &(*src_profile)[actRow]);
@@ -626,7 +626,7 @@ mySolution computeSimilarityMatrix4CompleteLocal(std::list<std::string *> src_pr
     unsigned long dimY = tgt_profile->size();//second->profile_mz.size()+1;
     unsigned long dimX = newSolution.src.profile_mz.size();//second->profile_mz.size()+1;
 
-    //std::cout << "dim: tgt: " << dimY << " src:" << dimX << std::endl;
+    //Rcpp::Rcout << "dim: tgt: " << dimY << " src:" << dimX << std::endl;
 
     //std::vector<std::string> first;
     std::vector<std::string> first;
@@ -703,7 +703,7 @@ mySolution computeSimilarityMatrix4CompleteLocal(std::list<std::string *> src_pr
 
 
                 //if((newSolution.mymatrix)[x][y].score > 0)
-                //    std::cout << "score: " << (newSolution.mymatrix)[x][y].score << std::endl;
+                //    Rcpp::Rcout << "score: " << (newSolution.mymatrix)[x][y].score << std::endl;
                 if((newSolution.mymatrix)[x][y].score < 0)
                     (newSolution.mymatrix)[x][y].score = 0;
 
@@ -720,9 +720,9 @@ mySolutionShort computeSimilarityMatrix4(mySolutionShort mysol, unsigned long ac
 
     double maxLocalScore = -(double)(mysol.src.profile_mz.size() + tgt_profile->size());
     double maxRowSum = 0;
-    //std::cout << "BEFORE:" << std::endl;
+    //Rcpp::Rcout << "BEFORE:" << std::endl;
     //printMatrix(mysol.mymatrix, N_NEIGHBORS+1, tgt_profile->size()+1);
-    //std::cout << "#####" << std::endl;
+    //Rcpp::Rcout << "#####" << std::endl;
 
     std::list<std::string*> profile = mysol.src.profile_mz;
     //ponechame jenom maximalne 10 poslednich
@@ -748,9 +748,9 @@ mySolutionShort computeSimilarityMatrix4(mySolutionShort mysol, unsigned long ac
     unsigned long ysize = dimY+1;
 
     /*
-    std::cout << "PRINT matrix:" << std::endl;
+    Rcpp::Rcout << "PRINT matrix:" << std::endl;
     printMatrix(mysol.mymatrix, (N_NEIGHBORS+1), (tgt_profile->size()+1));
-    std::cout << std::endl << std::endl;
+    Rcpp::Rcout << std::endl << std::endl;
 */
     //unsigned long x = 1;
     unsigned long xzero = (mysol.startROW-1)%N_NEIGHBORS;
@@ -758,7 +758,7 @@ mySolutionShort computeSimilarityMatrix4(mySolutionShort mysol, unsigned long ac
     {
         for(unsigned long y = 1; y <= dimY; ++y)
         {
-            //std::cout << "x: " << x << " y: " << y << std::endl;
+            //Rcpp::Rcout << "x: " << x << " y: " << y << std::endl;
             bool matchFlag = false;
             double orderPenalization_norm = orderPenalization[xzero]/(((double)*normalizator));
             double plus_match = 0;// ((firstVector[x-1]==secondVector[y-1])?s_match:s_dismatch);
@@ -808,14 +808,14 @@ mySolutionShort computeSimilarityMatrix4(mySolutionShort mysol, unsigned long ac
     mysol.maxLocalScore = maxLocalScore;//maxRowSum;//mysol.score;//maxLocalScore;
 
     /*
-    std::cout << "PRINT matrix2222:" << std::endl;
+    Rcpp::Rcout << "PRINT matrix2222:" << std::endl;
         printMatrix(mysol.mymatrix, (N_NEIGHBORS+1), (tgt_profile->size()+1));
-    std::cout << std::endl << std::endl;
+    Rcpp::Rcout << std::endl << std::endl;
     */
 
-    //std::cout << "AFTER:" << std::endl;
+    //Rcpp::Rcout << "AFTER:" << std::endl;
     //printMatrix(mysol.mymatrix, N_NEIGHBORS+1, tgt_profile->size()+1);
-    //std::cout << "####" << std::endl;
+    //Rcpp::Rcout << "####" << std::endl;
     return mysol;
 
 }
@@ -862,21 +862,21 @@ void printAlignment(mySolution *mysol, std::vector<std::string> *tgt)
 //horizontal
 //    for(int ii = 0; ii < seq1.size(); ++ii)
 //    {
-//        std::cout << seq1[ii] << " ";
+//        Rcpp::Rcout << seq1[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 //    for(int ii = 0; ii < seq2.size(); ++ii)
 //    {
-//        std::cout << seq2[ii] << " ";
+//        Rcpp::Rcout << seq2[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 
     //vertikal
-//    std::cout << "VERTIKAL: " << std::endl;
+//    Rcpp::Rcout << "VERTIKAL: " << std::endl;
     for(int ii = 0; ii < seq1.size(); ++ii)
     {
-        std::cout << seq1[ii] << "," << seq2[ii];
-        std::cout << std::endl;
+        Rcpp::Rcout << seq1[ii] << "," << seq2[ii];
+        Rcpp::Rcout << std::endl;
     }
 
 }
@@ -929,17 +929,17 @@ void printAlignmentToFile(mySolution *mysol, std::vector<std::string> *tgt, std:
 //horizontal
 //    for(int ii = 0; ii < seq1.size(); ++ii)
 //    {
-//        std::cout << seq1[ii] << " ";
+//        Rcpp::Rcout << seq1[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 //    for(int ii = 0; ii < seq2.size(); ++ii)
 //    {
-//        std::cout << seq2[ii] << " ";
+//        Rcpp::Rcout << seq2[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 
     //vertikal
-//    std::cout << "VERTIKAL: " << std::endl;
+//    Rcpp::Rcout << "VERTIKAL: " << std::endl;
     for(int ii = 0; ii < seq1.size(); ++ii)
     {
         myfile << seq1[ii] << "," << seq2[ii];
@@ -1002,17 +1002,17 @@ void printSemiAlignmentToFile(mySolution *mysol, std::vector<std::string> *tgt, 
 //horizontal
 //    for(int ii = 0; ii < seq1.size(); ++ii)
 //    {
-//        std::cout << seq1[ii] << " ";
+//        Rcpp::Rcout << seq1[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 //    for(int ii = 0; ii < seq2.size(); ++ii)
 //    {
-//        std::cout << seq2[ii] << " ";
+//        Rcpp::Rcout << seq2[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 
     //vertikal
-//    std::cout << "VERTIKAL: " << std::endl;
+//    Rcpp::Rcout << "VERTIKAL: " << std::endl;
     for(int ii = 0; ii < seq1.size(); ++ii)
     {
         myfile << seq1[ii] << "," << seq2[ii];
@@ -1117,7 +1117,7 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
     double localbest = -1000000;
     int besttgt = 0;
     m_elemnt element;
-//    std::cout << "A_";
+//    Rcpp::Rcout << "A_";
     //for(int ibest = 0; ibest < tgt->size(); ++ibest)
     for(int ibest = 0; ibest <= tgt->size(); ++ibest)
     {
@@ -1128,7 +1128,7 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
             besttgt = ibest;
         }
     }
-//    std::cout << "_B, best2: " << besttgt << std::endl;
+//    Rcpp::Rcout << "_B, best2: " << besttgt << std::endl;
 
 
     //m_elemnt element = mysol->mymatrix[mysol->src.profile_mz.size()][tgt->size()];
@@ -1136,18 +1136,18 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
     //for(unsigned int itgt = tgt->size()-1; itgt >= besttgt; --itgt)
     //for(unsigned int itgt = tgt->size()-1; itgt > besttgt; --itgt)
     //rovna se zpusobuje zpomaleni!!!
-    //std::cout << "my besttgt: " << besttgt << " tgt: " << tgt->size()-1 << std::endl;
+    //Rcpp::Rcout << "my besttgt: " << besttgt << " tgt: " << tgt->size()-1 << std::endl;
     for(int itgt = tgt->size()-1; itgt >= besttgt; --itgt)
     {
         //seq1.push_back("-");
         //seq2.push_back((*tgt)[itgt]);
-    //    std::cout << "itg: " << itgt << std::endl;
+    //    Rcpp::Rcout << "itg: " << itgt << std::endl;
         seq1.push_back(-1);
         seq2.push_back(itgt);
     }
-    //std::cout << "-------" << std::endl;
+    //Rcpp::Rcout << "-------" << std::endl;
 
-//    std::cout << "_C" << std::endl;
+//    Rcpp::Rcout << "_C" << std::endl;
 
     //match have not found
     if(besttgt != 0)
@@ -1186,7 +1186,7 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
         }
     }
 
-    //std::cout << "_D_" << std::endl;
+    //Rcpp::Rcout << "_D_" << std::endl;
     std::reverse(seq1.begin(), seq1.end());
     std::reverse(seq2.begin(), seq2.end());
     alingmentIndexes myAlign;
@@ -1197,16 +1197,16 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
  //   {
         //myfile << seq1[ii] << "," << seq2[ii];
         //myfile << std::endl;
- //      std::cout << "test: " << seq1[ii] << "," << seq2[ii] << std::endl;
+ //      Rcpp::Rcout << "test: " << seq1[ii] << "," << seq2[ii] << std::endl;
    // }
 
-//    std::cout << "_D_" << std::endl;
+//    Rcpp::Rcout << "_D_" << std::endl;
     return myAlign;
  /*   for(int ii = 0; ii < seq1.size(); ++ii)
     {
         //myfile << seq1[ii] << "," << seq2[ii];
         //myfile << std::endl;
-        std::cout << "test: " << seq1[ii] << "," << seq2[ii] << std::endl;
+        Rcpp::Rcout << "test: " << seq1[ii] << "," << seq2[ii] << std::endl;
     }
     */
     //myfile.close();
@@ -1254,25 +1254,25 @@ void printAlignmentOneColumn(mySolution *mysol, std::vector<std::string> *tgt)
 //horizontal
 //    for(int ii = 0; ii < seq1.size(); ++ii)
 //    {
-//        std::cout << seq1[ii] << " ";
+//        Rcpp::Rcout << seq1[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 //    for(int ii = 0; ii < seq2.size(); ++ii)
 //   {
-//        std::cout << seq2[ii] << " ";
+//        Rcpp::Rcout << seq2[ii] << " ";
 //    }
-//    std::cout << std::endl;
+//    Rcpp::Rcout << std::endl;
 
     //vertikal
-//    std::cout << "VERTIKAL: " << std::endl;
+//    Rcpp::Rcout << "VERTIKAL: " << std::endl;
     for(int ii = 0; ii < seq1.size(); ++ii)
     {
         if(seq1[ii] == "-")
-            std::cout << seq2[ii] << std::endl;
+            Rcpp::Rcout << seq2[ii] << std::endl;
         else
-            std::cout << seq1[ii] << std::endl;
-        //std::cout << seq1[ii] << "," << seq2[ii];
-        //std::cout << std::endl;
+            Rcpp::Rcout << seq1[ii] << std::endl;
+        //Rcpp::Rcout << seq1[ii] << "," << seq2[ii];
+        //Rcpp::Rcout << std::endl;
     }
 
 }

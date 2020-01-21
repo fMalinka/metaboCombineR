@@ -1,3 +1,0 @@
-useDynLib(metaboCombineR, .registration=TRUE)
-import(methods, Rcpp, RInside)
-export("runMetaboCombiner")

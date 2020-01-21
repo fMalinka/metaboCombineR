@@ -56,7 +56,7 @@ std::vector<string> loadCSVDataMZ(string path)
     while(std::getline(myfile, line))
     {
         if(SILENT)
-            std::cout << line << std::endl;
+            Rcpp::Rcout << line << std::endl;
         myvector.push_back(line);
         //myvector.push_back(line);
     }
@@ -100,7 +100,7 @@ std::vector<std::pair<int,int> > aggregateAlignments(std::vector<alingmentIndexe
             {
                 commonIndexesRef[(*allAlignments)[iali].indexRef[irow]] = (*allAlignments)[iali].indexNonref[irow]+(*allAlignments)[iali].startRow;
                 commonIndexesRefCandidates[(*allAlignments)[iali].indexRef[irow]].push_back((*allAlignments)[iali].indexNonref[irow]+(*allAlignments)[iali].startRow);
-                //std::cout << "as: " << (*allAlignments)[iali].indexNonref[irow]+(*allAlignments)[iali].startRow << std::endl;
+                //Rcpp::Rcout << "as: " << (*allAlignments)[iali].indexNonref[irow]+(*allAlignments)[iali].startRow << std::endl;
             }
 
         }
@@ -165,7 +165,7 @@ std::vector<std::pair<int,int> > aggregateAlignments(std::vector<alingmentIndexe
         if(missingNonrefOccurance.find(ic) == missingNonrefOccurance.end())
         {
             missingNonrefInd.push_back(ic);
-            //std::cout << "ic: " << ic << std::endl;
+            //Rcpp::Rcout << "ic: " << ic << std::endl;
         }
     }
 //Rcpp::Rcout << "_E4" << std::endl;
@@ -182,25 +182,25 @@ std::vector<std::pair<int,int> > aggregateAlignments(std::vector<alingmentIndexe
 
     int nCommonHits = 0;//0;//0;
     int mnmislastid = 0;//0;
-    //std::cout << "size ref: " << commonIndexesRef.size() << " non: " << missingNonrefInd.size() << std::endl;
+    //Rcpp::Rcout << "size ref: " << commonIndexesRef.size() << " non: " << missingNonrefInd.size() << std::endl;
     for(int ires = 0; ires < commonIndexesRef.size(); ++ires)
     {
-        //std::cout << " " << ires;
+        //Rcpp::Rcout << " " << ires;
         if(commonIndexesRef[ires] != -1)
         {            
             //only on nonref
-            //std::cout << " minnsin: " << missingNonrefInd[mnmislastid] << " common: " << commonIndexesRef[ires] << std::endl;
+            //Rcpp::Rcout << " minnsin: " << missingNonrefInd[mnmislastid] << " common: " << commonIndexesRef[ires] << std::endl;
             if(!missingNonrefInd.empty())
             {
-                //std::cout << "mnmislastid: " << mnmislastid << " missingNonrefInd: " << missingNonrefInd.size() << std::endl;
+                //Rcpp::Rcout << "mnmislastid: " << mnmislastid << " missingNonrefInd: " << missingNonrefInd.size() << std::endl;
                 if(mnmislastid < (missingNonrefInd.size()))
                 {
-                    //std::cout << "passs" << std::endl;
+                    //Rcpp::Rcout << "passs" << std::endl;
                     while(missingNonrefInd[mnmislastid] < commonIndexesRef[ires])
                     {
 
                         resultsInds.push_back(std::pair<int,int>(missingNonrefInd[mnmislastid], -1));
-                        //std::cout << "mmnilastid: " << mnmislastid << " nonrefind: " << missingNonrefInd[mnmislastid] << std::endl;
+                        //Rcpp::Rcout << "mmnilastid: " << mnmislastid << " nonrefind: " << missingNonrefInd[mnmislastid] << std::endl;
                         mnmislastid++;
                         if(mnmislastid >= missingNonrefInd.size())
                             break;
@@ -212,7 +212,7 @@ std::vector<std::pair<int,int> > aggregateAlignments(std::vector<alingmentIndexe
                     {
                         resultsInds.push_back(std::pair<int,int>(missingNonrefInd[ires], -1));
                         mnmislastid++;
-                        //std::cout << missingNonrefInd[ires] << std::endl;
+                        //Rcpp::Rcout << missingNonrefInd[ires] << std::endl;
                     }
                 }
                 */
@@ -225,7 +225,7 @@ std::vector<std::pair<int,int> > aggregateAlignments(std::vector<alingmentIndexe
 /*
 
             resultsInds.push_back(std::pair<int,int>(nCommonHits, -1));
-                std::cout << nCommonHits << std::endl;
+                Rcpp::Rcout << nCommonHits << std::endl;
             //++nCommonHits;
 //resultsInds.push_back(std::pair<int,int>(nCommonHits, -1));
 //resultsInds.push_back(std::pair<int,int>(commonIndexesRef[nCommonHits], -1));
@@ -250,12 +250,12 @@ std::vector<std::pair<int,int> > aggregateAlignments(std::vector<alingmentIndexe
 //    Rcpp::Rcout << std::endl << "_E5" << std::endl;
     //end
 
-    //std::cout << "END\n" << "mnmislastid: " << mnmislastid << " missingNonrefInd: " << missingNonrefInd.size() << std::endl;
+    //Rcpp::Rcout << "END\n" << "mnmislastid: " << mnmislastid << " missingNonrefInd: " << missingNonrefInd.size() << std::endl;
     for(int ires = mnmislastid; ires < missingNonrefInd.size(); ++ires)
     {
-        //std::cout << "ADDEDEDED\n";
+        //Rcpp::Rcout << "ADDEDEDED\n";
         resultsInds.push_back(std::pair<int,int>(missingNonrefInd[ires], -1));
-        //std::cout << missingNonrefInd[ires] << std::endl;
+        //Rcpp::Rcout << missingNonrefInd[ires] << std::endl;
     }
 
 
@@ -293,7 +293,7 @@ Rcpp::NumericMatrix generateAlignmentMatrix(int window_size, experiment *expNonR
 //        std::stringstream ss;
 //        ss << isample;
 //        name = "align_" + ss.str();//std::to_string(isample);
-//        std::cout << name << std::endl;
+//        Rcpp::Rcout << name << std::endl;
 //        printLocalAlignmentToFile(&rowAlign, &exp2Ref->mzStr, name);
         alingmentIndexes resAlign = processLocalAlignments(&rowAlign, &(exp2Ref->mzStr));
         resAlign.expNonref = expNonRef;
@@ -382,7 +382,7 @@ experiment generateAlignmentExperiment(int window_size, experiment *expNonRef, e
         //std::stringstream ss;
         //ss << isample;
         //name = "align_" + ss.str();//std::to_string(isample);
-        //std::cout << name << std::endl;
+        //Rcpp::Rcout << name << std::endl;
         //printLocalAlignmentToFile(&rowAlign, &(exp2Ref->mzStr), name);
 //        Rcpp::Rcout << "B processLocalAlignments" << std::endl;
         alingmentIndexes resAlign = processLocalAlignments(&rowAlign, &(exp2Ref->mzStr));
@@ -391,7 +391,7 @@ experiment generateAlignmentExperiment(int window_size, experiment *expNonRef, e
         resAlign.expRef = exp2Ref;
         resAlign.startRow = isample;
         allAlignments.push_back(resAlign);
- //       std::cout << "isample: " << isample << "/" << mysamples_windows.size() << std::endl;
+ //       Rcpp::Rcout << "isample: " << isample << "/" << mysamples_windows.size() << std::endl;
     }
 //Rcpp::Rcout << "_E_" << std::endl;
     std::vector<std::pair<int,int> > index2table = aggregateAlignments(&allAlignments); //nonref, ref
@@ -555,7 +555,7 @@ std::pair<int, int> findTheMostSimilar(std::vector<experiment> *multiAlignmentEx
         for(int icol = irow+1; icol < multiAlignmentExperiment->size(); ++icol)
         {
             double score = getSimilarity(&((*multiAlignmentExperiment)[irow]), &((*multiAlignmentExperiment)[icol]));
-            //std::cout << "irow: " << irow << " icol: " << icol <<" score: " << score << std::endl;
+            //Rcpp::Rcout << "irow: " << irow << " icol: " << icol <<" score: " << score << std::endl;
             if(score < bestscore)
             {
                 bestscore = score;
@@ -607,7 +607,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
             mzstrstream << newExp.mz(irt);
             rtstrstream << newExp.rt(irt);
             newExp.mzStr[irt] = mzstrstream.str();
-            //std::cout << mzstrstream.str() << " a " << newExp.mz(irt) << std::endl;
+            //Rcpp::Rcout << mzstrstream.str() << " a " << newExp.mz(irt) << std::endl;
             newExp.rtStr[irt] = rtstrstream.str();
 
         }        
@@ -624,13 +624,13 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         //newExp.experimentName = expname.str();
         this->experiments.push_back(newExp);
     }
-    //std::cout << "------\n";
+    //Rcpp::Rcout << "------\n";
 
     std::vector<experiment> multiAlignmentExperiment;
     Rcpp::Rcout << "Successfully loaded " << this->experiments.size()  << " datasets!" << std::endl;
 
 
-//    std::cout << "Finding centroid with the highest number of peaks..." << std::endl;
+//    Rcpp::Rcout << "Finding centroid with the highest number of peaks..." << std::endl;
 //    int centroid = 0;
 //    int maxcentroid = 0;
     for(int iexp = 0; iexp < allExps.size(); ++iexp)
@@ -643,7 +643,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         multiAlignmentExperiment.push_back(this->experiments[iexp]);
     }
 
-//    std::cout << "The centroid is data table number " << centroid << " with " << maxcentroid << " peaks" << std::endl;
+//    Rcpp::Rcout << "The centroid is data table number " << centroid << " with " << maxcentroid << " peaks" << std::endl;
 
     //experiment exp2Ref = this->experiments[centroid];
     //std::vector<Rcpp::NumericMatrix> multiAlignments(this->experiments.size());
@@ -661,7 +661,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
     {
         std::pair<int, int> mostsimilar = findTheMostSimilar(&multiAlignmentExperiment);
         Rcpp::Rcout << ".";
-        //std::cout << "non ref: " << mostsimilar.first  << " (" << multiAlignmentExperiment[mostsimilar.first].mzStr.size() << ", row: " << multiAlignmentExperiment[mostsimilar.first].experiments.nrow()  << ", col: " << multiAlignmentExperiment[mostsimilar.first].experiments.ncol() << ") ref: " << mostsimilar.second << " (" << multiAlignmentExperiment[mostsimilar.second].mzStr.size() << ", row: " << multiAlignmentExperiment[mostsimilar.second].experiments.nrow()  << ", col: " << multiAlignmentExperiment[mostsimilar.second].experiments.ncol()  << ")" << std::endl;
+        //Rcpp::Rcout << "non ref: " << mostsimilar.first  << " (" << multiAlignmentExperiment[mostsimilar.first].mzStr.size() << ", row: " << multiAlignmentExperiment[mostsimilar.first].experiments.nrow()  << ", col: " << multiAlignmentExperiment[mostsimilar.first].experiments.ncol() << ") ref: " << mostsimilar.second << " (" << multiAlignmentExperiment[mostsimilar.second].mzStr.size() << ", row: " << multiAlignmentExperiment[mostsimilar.second].experiments.nrow()  << ", col: " << multiAlignmentExperiment[mostsimilar.second].experiments.ncol()  << ")" << std::endl;
         std::vector<experiment> newExp;
         for(int iel = 0; iel < multiAlignmentExperiment.size(); ++iel)
         {
@@ -672,8 +672,8 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         }
         newExp.push_back(generateAlignmentExperiment(window_size, &(multiAlignmentExperiment[mostsimilar.first]), &(multiAlignmentExperiment[mostsimilar.second])));
         multiAlignmentExperiment = newExp;
-        //std::cout << "Making an alignment from subexperiment " <<
-        //std::cout << "new size: " << multiAlignmentExperiment.size() << std::endl;
+        //Rcpp::Rcout << "Making an alignment from subexperiment " <<
+        //Rcpp::Rcout << "new size: " << multiAlignmentExperiment.size() << std::endl;
     } while(multiAlignmentExperiment.size() > 1);
     Rcpp::Rcout << " Done" << std::endl;
     return multiAlignmentExperiment.back().experiments;
@@ -687,7 +687,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         for(int icol = irow+1; icol < multiAlignmentExperiment.size(); ++icol)
         {
             double score = getSimilarity(&(multiAlignmentExperiment[irow]), &(multiAlignmentExperiment[icol]));
-            std::cout << "irow: " << irow << " icol: " << icol <<" score: " << score << std::endl;
+            Rcpp::Rcout << "irow: " << irow << " icol: " << icol <<" score: " << score << std::endl;
             if(score < bestscore)
             {
                 bestscore = score;
@@ -726,7 +726,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
 */
 //    while(!multiAlignmentExperiment.empty())
 //    {
-//        std::cout << "size: " << multiAlignmentExperiment.size() << std::endl;
+//        Rcpp::Rcout << "size: " << multiAlignmentExperiment.size() << std::endl;
 //        experiment toadd = multiAlignmentExperiment.front();
 //        multiAlignmentExperiment.pop_front();
 //        exp2Ref = generateAlignmentExperiment(window_size, &toadd, &exp2Ref);
@@ -763,12 +763,12 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
 
     for(int ia = 0; ia < multiAlignmentIndexes[0].size(); ++ia)
     {
-        std::cout << "first: " << multiAlignmentIndexes[0][ia].first << " second: " << multiAlignmentIndexes[0][ia].second << std::endl;
+        Rcpp::Rcout << "first: " << multiAlignmentIndexes[0][ia].first << " second: " << multiAlignmentIndexes[0][ia].second << std::endl;
     }
-    std::cout << "---------------------------------------------" << std::endl;
+    Rcpp::Rcout << "---------------------------------------------" << std::endl;
     for(int ia = 0; ia < multiAlignmentIndexes[1].size(); ++ia)
     {
-        std::cout << "first: " << multiAlignmentIndexes[1][ia].first << " second: " << multiAlignmentIndexes[1][ia].second << std::endl;
+        Rcpp::Rcout << "first: " << multiAlignmentIndexes[1][ia].first << " second: " << multiAlignmentIndexes[1][ia].second << std::endl;
     }
 
     std::vector<std::vector<int> > alignIndexREF(multiAlignmentIndexes.size()-1);   //align/row
@@ -788,26 +788,26 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
                     //if(!nonrefacts.empty())
                     //{
                         alignIndexNONREF[icombine].push_back(nonrefacts);
-                        std::cout  << "ref..." << std::endl;
+                        Rcpp::Rcout  << "ref..." << std::endl;
 
                         for(int itest = 0; itest < alignIndexNONREF[icombine].back().size(); ++itest)
                         {
                             experiment expNonRef = this->experiments[icombine];
-                            std::cout << "NONREF: " << expNonRef.mzStr[multiAlignmentIndexes[icombine][alignIndexNONREF[icombine].back()[itest]].first] << " ";
+                            Rcpp::Rcout << "NONREF: " << expNonRef.mzStr[multiAlignmentIndexes[icombine][alignIndexNONREF[icombine].back()[itest]].first] << " ";
                         }
-                        std::cout << std::endl;
-                        std::cout << "REF! " << exp2Ref.mzStr[multiAlignmentIndexes[icombine][irow].second] << std::endl;
+                        Rcpp::Rcout << std::endl;
+                        Rcpp::Rcout << "REF! " << exp2Ref.mzStr[multiAlignmentIndexes[icombine][irow].second] << std::endl;
                         nonrefacts.clear();
                     //}
                     //alignIndexNONREF[icombine].push_back(nonrefacts);
                         //experiment expNonRef = this->experiments[icombine];
-                        //std::cout << "REF! " << multiAlignmentIndexes[icombine][irow].second << " - "  << expNonRef.mzStr[multiAlignmentIndexes[icombine][irow].second] << std::endl;
+                        //Rcpp::Rcout << "REF! " << multiAlignmentIndexes[icombine][irow].second << " - "  << expNonRef.mzStr[multiAlignmentIndexes[icombine][irow].second] << std::endl;
                 }
                 else
                 {
-                    std::cout  << "nonref..." << std::endl;
+                    Rcpp::Rcout  << "nonref..." << std::endl;
                     //experiment expNonRef = this->experiments[icombine];
-                    //std::cout << "NONREF! " << expNonRef.mzStr[multiAlignmentIndexes[icombine][irow].first] << std::endl;
+                    //Rcpp::Rcout << "NONREF! " << expNonRef.mzStr[multiAlignmentIndexes[icombine][irow].first] << std::endl;
                     nonrefacts.push_back(irow);
                 }
             }
@@ -821,23 +821,23 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         {
             if(!multiAlignmentIndexes[icombine].empty())
             {
-                std::cout << " |# " << alignIndexNONREF[icombine][irow].size();
+                Rcpp::Rcout << " |# " << alignIndexNONREF[icombine][irow].size();
                 experiment expNonRef = this->experiments[icombine];
                 for(int ii = 0; ii < alignIndexNONREF[icombine][irow].size(); ++ii)
                 {
-                    std::cout << "!";
-                    //std::cout << expNonRef.mzStr[multiAlignmentIndexes[icombine][alignIndexNONREF[icombine][irow][ii]].second]  << " ";
-                    //std::cout << alignIndexNONREF[icombine][irow][ii] << " ";
-                    std::cout << expNonRef.mzStr[multiAlignmentIndexes[icombine][alignIndexNONREF[icombine][irow][ii]].first] << " ";
-                    //std::cout << expNonRef.mzStr[alignIndexNONREF[icombine][irow][ii]] << " ";
+                    Rcpp::Rcout << "!";
+                    //Rcpp::Rcout << expNonRef.mzStr[multiAlignmentIndexes[icombine][alignIndexNONREF[icombine][irow][ii]].second]  << " ";
+                    //Rcpp::Rcout << alignIndexNONREF[icombine][irow][ii] << " ";
+                    Rcpp::Rcout << expNonRef.mzStr[multiAlignmentIndexes[icombine][alignIndexNONREF[icombine][irow][ii]].first] << " ";
+                    //Rcpp::Rcout << expNonRef.mzStr[alignIndexNONREF[icombine][irow][ii]] << " ";
                 }
 
-                std::cout << " #} ";
-                std::cout << exp2Ref.mzStr[multiAlignmentIndexes[icombine][alignIndexREF[icombine][irow]].second]  << " ";
+                Rcpp::Rcout << " #} ";
+                Rcpp::Rcout << exp2Ref.mzStr[multiAlignmentIndexes[icombine][alignIndexREF[icombine][irow]].second]  << " ";
             }
         }
-        std::cout << " (" << exp2Ref.mzStr[irow]  << ") ";
-        std::cout << std::endl;
+        Rcpp::Rcout << " (" << exp2Ref.mzStr[irow]  << ") ";
+        Rcpp::Rcout << std::endl;
     }
 
 */
@@ -858,7 +858,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         //checkIndexState(&((multiAlignmentIndexes[ialign])[lastIndex[ialign]]));
         if(ialign != centroid)
         {
-            //std::cout << "size: " << multiAlignmentIndexes[ialign].size() << std::endl;
+            //Rcpp::Rcout << "size: " << multiAlignmentIndexes[ialign].size() << std::endl;
             int statmatch = 0; int statonlyref = 0; int statonlynonref = 0; int statmatchref = 0;
             std::vector<int> nonrefInterval;
             for(int iind = 0; iind < multiAlignmentIndexes[ialign].size(); ++iind)
@@ -873,11 +873,11 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
                 if(state == MATCH || state == ONLYREF)
                 {
                     //exp2Ref.mzStr[multiAlignmentIndexes[ialign][iind].first]
-                    std::cout << exp2Ref.mzStr[multiAlignmentIndexes[ialign][iind].second]  << " ";
+                    Rcpp::Rcout << exp2Ref.mzStr[multiAlignmentIndexes[ialign][iind].second]  << " ";
 
                     statmatchref++;
                     refIds[ialign].push_back(iind);
-                    //std::cout << " " << iind;
+                    //Rcpp::Rcout << " " << iind;
 
                     //close interval
                     if(!nonrefInterval.empty())
@@ -892,10 +892,10 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
                 else
                 {
                     nonrefInterval.push_back(iind);
-                    //std::cout << this->experiments[ialign].mzStr[multiAlignmentIndexes[ialign][iind].first]  << "(" << multiAlignmentIndexes[ialign][iind].first << ")" << multiAlignmentIndexes[ialign][iind].first <<  " ";
+                    //Rcpp::Rcout << this->experiments[ialign].mzStr[multiAlignmentIndexes[ialign][iind].first]  << "(" << multiAlignmentIndexes[ialign][iind].first << ")" << multiAlignmentIndexes[ialign][iind].first <<  " ";
                 }
             }
-            //std::cout << std::endl <<"ialign: " << ialign << " match:" << statmatch << " onlyref:" << statonlyref << " onlynonref:" << statonlynonref << " statmatchRef: " << statmatchref << std::endl;
+            //Rcpp::Rcout << std::endl <<"ialign: " << ialign << " match:" << statmatch << " onlyref:" << statonlyref << " onlynonref:" << statonlynonref << " statmatchRef: " << statmatchref << std::endl;
         }
         //lastIndex[ialign]
         //
@@ -903,26 +903,26 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         {
             for(int iiii = 0; iiii <norefCandidatasIds_interval[ialign][iii].size(); ++iiii)
             {
-                //std::cout << norefCandidatasIds_interval[ialign][iii][iiii] << " ";
+                //Rcpp::Rcout << norefCandidatasIds_interval[ialign][iii][iiii] << " ";
             }
-            //std::cout << "***" << std::endl;
+            //Rcpp::Rcout << "***" << std::endl;
             int sec = multiAlignmentIndexes[ialign][iii].second;
             int frst = multiAlignmentIndexes[ialign][iii].first;
             if(sec == -1)
-                ;//std::cout << " f: " << this->experiments[ialign].mzStr[frst] << " s: -1" ;
+                ;//Rcpp::Rcout << " f: " << this->experiments[ialign].mzStr[frst] << " s: -1" ;
             else if(frst == -1)
-                ;//std::cout << " f: -1  s: " << exp2Ref.mzStr[sec] ;
+                ;//Rcpp::Rcout << " f: -1  s: " << exp2Ref.mzStr[sec] ;
             else
-                ;//std::cout << " f: " << this->experiments[ialign].mzStr[multiAlignmentIndexes[ialign][iii].first] << " s: " << exp2Ref.mzStr[multiAlignmentIndexes[ialign][iii].second] ;
-            //std::cout << std::endl;
+                ;//Rcpp::Rcout << " f: " << this->experiments[ialign].mzStr[multiAlignmentIndexes[ialign][iii].first] << " s: " << exp2Ref.mzStr[multiAlignmentIndexes[ialign][iii].second] ;
+            //Rcpp::Rcout << std::endl;
 
         }
-        std::cout << "--------------" << std::endl;
+        Rcpp::Rcout << "--------------" << std::endl;
     }
     */
 
 //    Rcpp::NumericMatrix results;
-//    std::cout << "END" << std::endl;
+//    Rcpp::Rcout << "END" << std::endl;
 //    return results;
 }
 
@@ -934,7 +934,7 @@ double computeScore(std::vector<std::string> sample1, std::vector<std::string> s
 
     //prepare data
     if(SILENT)
-        std::cout << "generating initial set..";
+        Rcpp::Rcout << "generating initial set..";
     std::map<std::string, bool> commonSeqs;
     std::vector<std::string> src_profile = sample1;   //obsahuje puvodni src retezec
     std::vector<std::string> tgt_profile = sample2;   //obsahuje puvodni src retezec
@@ -943,7 +943,7 @@ double computeScore(std::vector<std::string> sample1, std::vector<std::string> s
     //multipleAlingmentR tgt;
     mySolutionShort init = generateInitionSet(&sample1, &sample2, &commonSeqs, &peakPosTgz);
     if(SILENT)
-        std::cout << "OK" << std::endl;
+        Rcpp::Rcout << "OK" << std::endl;
     //queue alignments
     std::priority_queue<mySolutionShort> newTmp;
     newTmp.push(init);
@@ -957,7 +957,7 @@ double computeScore(std::vector<std::string> sample1, std::vector<std::string> s
        //325
         if(irow == 32)
         {
-            std::cout << "ttttt";
+            Rcpp::Rcout << "ttttt";
         }
 
         //for each myALIGN in OPEN
@@ -1000,7 +1000,7 @@ double computeScore(std::vector<std::string> sample1, std::vector<std::string> s
             newTmp.pop();
         }
         if(SILENT)
-            std::cout << "row " << irow+1 << " / " << src_profile.size() << std::endl;
+            Rcpp::Rcout << "row " << irow+1 << " / " << src_profile.size() << std::endl;
     }
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -1027,7 +1027,7 @@ std::vector<std::string> makeAlignment(std::vector<std::string> sample1, std::ve
 
     //prepare data
     if(SILENT)
-        std::cout << "generating initial set..";
+        Rcpp::Rcout << "generating initial set..";
     std::map<std::string, bool> commonSeqs;
     std::vector<std::string> src_profile = sample1;   //obsahuje puvodni src retezec
     std::vector<std::string> tgt_profile = sample2;   //obsahuje puvodni src retezec
@@ -1036,7 +1036,7 @@ std::vector<std::string> makeAlignment(std::vector<std::string> sample1, std::ve
     //multipleAlingmentR tgt;
     mySolutionShort init = generateInitionSet(&sample1, &sample2, &commonSeqs, &peakPosTgz);
     if(SILENT)
-        std::cout << "OK" << std::endl;
+        Rcpp::Rcout << "OK" << std::endl;
     //queue alignments
     std::priority_queue<mySolutionShort> newTmp;
     newTmp.push(init);
@@ -1088,7 +1088,7 @@ std::vector<std::string> makeAlignment(std::vector<std::string> sample1, std::ve
             newTmp.pop();
         }
         if(SILENT)
-            std::cout << "row " << irow+1 << " / " << src_profile.size() << std::endl;
+            Rcpp::Rcout << "row " << irow+1 << " / " << src_profile.size() << std::endl;
     }
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -1114,7 +1114,7 @@ void make2ColAlignment(std::vector<std::string> sample1, std::vector<std::string
 
     //prepare data
     if(SILENT)
-        std::cout << "generating initial set..";
+        Rcpp::Rcout << "generating initial set..";
     std::map<std::string, bool> commonSeqs;
     std::vector<std::string> src_profile = sample1;   //obsahuje puvodni src retezec
     std::vector<std::string> tgt_profile = sample2;   //obsahuje puvodni src retezec
@@ -1123,7 +1123,7 @@ void make2ColAlignment(std::vector<std::string> sample1, std::vector<std::string
     //multipleAlingmentR tgt;
     mySolutionShort init = generateInitionSet(&sample1, &sample2, &commonSeqs, &peakPosTgz);
     if(SILENT)
-        std::cout << "OK" << std::endl;
+        Rcpp::Rcout << "OK" << std::endl;
     //queue alignments
     std::priority_queue<mySolutionShort> newTmp;
     newTmp.push(init);
@@ -1187,7 +1187,7 @@ void make2ColAlignment(std::vector<std::string> sample1, std::vector<std::string
 
                         newTmp2.push(newscore);
                         ++candEval;
-                        std::cout << " " << isol;
+                        Rcpp::Rcout << " " << isol;
                     }
                     else
                     {
@@ -1221,7 +1221,7 @@ void make2ColAlignment(std::vector<std::string> sample1, std::vector<std::string
             newTmp.pop();
         }
         if(SILENT)
-            std::cout << "row " << irow+1 << " / " << src_profile.size() << " evaluated: "<< candEval << " nonEvaluated: " << candNonEval << std::endl;
+            Rcpp::Rcout << "row " << irow+1 << " / " << src_profile.size() << " evaluated: "<< candEval << " nonEvaluated: " << candNonEval << std::endl;
     }
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
@@ -1264,34 +1264,34 @@ int main(int argc, char* argv[])
 
         if(strcmp(argv[iparam], "-i") == 0 && iparam+1 < argc)
         {
-            std::cout << "-i: " << argv[iparam+1] << std::endl;
+            Rcpp::Rcout << "-i: " << argv[iparam+1] << std::endl;
             FILTER_LIMIT = strtoul(argv[iparam+1], NULL, 0);
             ++iparam;
         }
         else if(strcmp(argv[iparam], "-v") == 0)
         {
             twocolumnResult = true;
-            std::cout << "Two column results..." << std::endl;
+            Rcpp::Rcout << "Two column results..." << std::endl;
         }
         else if(strcmp(argv[iparam], "-normal") == 0)
         {
             normalAling = true;
-            //std::cout << "Two column results..." << std::endl;
+            //Rcpp::Rcout << "Two column results..." << std::endl;
         }
         else if(strcmp(argv[iparam], "-new") == 0)
         {
             newalg = true;
-            //std::cout << "Two column results..." << std::endl;
+            //Rcpp::Rcout << "Two column results..." << std::endl;
         }
         else if(strcmp(argv[iparam], "-normal2") == 0)
         {
             normalAling2 = true;
-            //std::cout << "Two column results..." << std::endl;
+            //Rcpp::Rcout << "Two column results..." << std::endl;
         }
         else
         {
             samplePaths.push_back(argv[iparam]);
-            std::cout << argv[iparam] << std::endl;
+            Rcpp::Rcout << argv[iparam] << std::endl;
         }
     }
 
@@ -1308,7 +1308,7 @@ int main(int argc, char* argv[])
     //double param = 15;
     //double sd = 100/3;
     //double res = erfc(param / (sd*sqrt(2)) );
-    //std::cout << "res: " << res << std::endl;
+    //Rcpp::Rcout << "res: " << res << std::endl;
 
     //return 1;
 
@@ -1342,7 +1342,7 @@ int main(int argc, char* argv[])
             std::stringstream ss;
             ss << isample;
             name = "align_" + ss.str();//std::to_string(isample);
-            std::cout << name << std::endl;
+            Rcpp::Rcout << name << std::endl;
             printLocalAlignmentToFile(&rowAlign, &mysamples[1], name);
         }
 
@@ -1360,7 +1360,7 @@ int main(int argc, char* argv[])
                 double bestscore = 0;
                 int bestscoreI;
                 int bestScoreJ;
-                std::cout << "round " << round << std::endl;
+                Rcpp::Rcout << "round " << round << std::endl;
                 #pragma omp parallel for
                 for(int i = 0; i < mysamples.size(); ++i)
                 {
@@ -1368,7 +1368,7 @@ int main(int argc, char* argv[])
                     {
                         double score;
                         score = computeScore(mysamples[i], mysamples[j], FILTER_LIMIT);
-                        std::cout << "score: " << samplePaths[i] << " j: " << samplePaths[j] << " : " << score << std::endl;
+                        Rcpp::Rcout << "score: " << samplePaths[i] << " j: " << samplePaths[j] << " : " << score << std::endl;
                         if(score > bestscore)
                         {
                             bestscore = score;
@@ -1378,7 +1378,7 @@ int main(int argc, char* argv[])
                     }
                 }
 
-                std::cout << "best samples: " << samplePaths[bestscoreI] << " and " << samplePaths[bestScoreJ] << " ... will be concatenated" << std::endl;
+                Rcpp::Rcout << "best samples: " << samplePaths[bestscoreI] << " and " << samplePaths[bestScoreJ] << " ... will be concatenated" << std::endl;
 
                 std::vector<std::vector<std::string > > new_mysamples;
                 std::vector<std::string > new_samplePaths;
@@ -1391,10 +1391,10 @@ int main(int argc, char* argv[])
                     }
                 }
                 std::vector<std::string> newalign = makeAlignment(mysamples[bestscoreI], mysamples[bestScoreJ], FILTER_LIMIT);
-                std::cout << "new alignment:" << std::endl;
+                Rcpp::Rcout << "new alignment:" << std::endl;
                 for(int ialign = 0; ialign < newalign.size(); ++ialign)
                 {
-                    std::cout << newalign[ialign] << std::endl;
+                    Rcpp::Rcout << newalign[ialign] << std::endl;
                 }
 
                 std::string newpath = samplePaths[bestscoreI] + std::string("_") + samplePaths[bestScoreJ];
@@ -1405,34 +1405,34 @@ int main(int argc, char* argv[])
                 ++round;
 
 
-                //std::cout << "########### END ROUND ###########" << std::endl << std::endl;
+                //Rcpp::Rcout << "########### END ROUND ###########" << std::endl << std::endl;
             }
         }
         else
         {
-            std::cout << "Two columns result" << std::endl;
+            Rcpp::Rcout << "Two columns result" << std::endl;
             make2ColAlignment(mysamples[0], mysamples[1], FILTER_LIMIT);
         }
     }
     else if(normalAling)
     {
-        //std::cout << "=====RAW alignment: =====" << std::endl;
+        //Rcpp::Rcout << "=====RAW alignment: =====" << std::endl;
         std::list<std::string*> rowsrc_profile_mz;
         for(unsigned long irow = 0; irow < mysamples[0].size(); ++irow)
         {
             rowsrc_profile_mz.push_back(&mysamples[0][irow]);
         }
         mySolution rowAlign = computeSimilarityMatrix4Complete(rowsrc_profile_mz, &mysamples[1]);
-        //std::cout << "Printing..." << std::endl;
+        //Rcpp::Rcout << "Printing..." << std::endl;
         //printAlignment(&rowAlign, &mysamples[1]);
         printAlignmentOneColumn(&rowAlign, &mysamples[1]);
-        //std::cout << "finished in " << elapsed_secs << "seconds" << std::endl;
-        //std::cout << "SCORE wrt order: " << best.score << " only alignment: " << rowAlign.score << std::endl;
+        //Rcpp::Rcout << "finished in " << elapsed_secs << "seconds" << std::endl;
+        //Rcpp::Rcout << "SCORE wrt order: " << best.score << " only alignment: " << rowAlign.score << std::endl;
         //freeMatrix(&bestnoncomplete);
     }
     else
     {
-        //std::cout << "=====RAW alignment: =====" << std::endl;
+        //Rcpp::Rcout << "=====RAW alignment: =====" << std::endl;
         std::list<std::string*> rowsrc_profile_mz;
         for(unsigned long irow = 0; irow < mysamples[0].size(); ++irow)
         {
