@@ -52,10 +52,49 @@ prepareExperiments <- function(listOfExperiment, listOfISindexes)
     return(list(experiments = allExps, ISindexes = allIS))
 }
 
+#check List
+isValid <- function(dataframe)
+{
+    mzs <- rownames(dataframe)
+    rownameFormat <- all(grepl(
+        pattern = "^M(\\d+|\\d+\\.\\d+)T(\\d+|\\d+\\.\\d+)", mzs))
+    valueFormat <- all(sapply(dataframe, is.numeric))
+    rowDim <- nrow(dataframe) > 0
+    colDim <- ncol(dataframe) > 0
+    return(rownameFormat & valueFormat & rowDim & colDim)
+}
+
+
 runMetaboCombiner <- function(listExperimens, mzprecision = 3, windowsize = 5)
 {
     myclass <- new(metaboCombineR)
-    finalmatrix <- myclass$run(listExperimens, mzprecision, windowsize)
+    ilist  <- 1
+    listValid <- rep(FALSE, length(listExperimens))
+    for(elist in listExperimens)
+    {
+        if(isValid(elist))
+        {
+            write(paste0("experiment n.", ilist, " has ", ncol(elist),
+                " samples and ", nrow(elist),
+                " features. Format seems VALID."), stderr())
+            listValid[ilist] <- TRUE
+        }
+        else
+        {
+            write(paste0("experiment n.", ilist, ". Format seems INVALID."),
+                stderr())
+        }
+        ilist <- ilist + 1
+    }
+    if(all(listValid))
+    {
+        finalmatrix <- myclass$run(listExperimens, mzprecision, windowsize)
+    }
+    else
+    {
+        write(paste0("ERROR: Check INPUT files!"), stderr())
+        finalmatrix  <- NULL
+    }
     rm(myclass)
     return(finalmatrix)
 }
