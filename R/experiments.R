@@ -1,13 +1,23 @@
 sortDataFrameByRt <- function(data, mzprecision=2)
 {
     mzprec <- 10^mzprecision
-    mzs <- signif(as.numeric(regmatches(rownames(data),
+    mzs <- trunc(as.numeric(regmatches(rownames(data),
     regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec
     
     rts <- as.numeric(substring(regmatches(rownames(data),
     regexpr("T\\d+(\\.\\d+)?",rownames(data), perl=TRUE)),2))
     rtsOrder <- order(rts)
     newdata <- data[rtsOrder,]
+    return(as.matrix(newdata))
+}
+
+sortDataFrameByMz <- function(data)
+{    
+    mzs <- as.numeric(regmatches(rownames(data),
+    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))
+    
+    mzsOrder <- order(mzs)
+    newdata <- data[mzsOrder,]
     return(as.matrix(newdata))
 }
 
@@ -20,14 +30,14 @@ getRTs <- function(data)
 getMZs <- function(data, mzprecision=2)
 {
     mzprec <- 10^mzprecision
-    return(as.numeric(signif(as.numeric(regmatches(rownames(data),
+    return(as.numeric(trunc(as.numeric(regmatches(rownames(data),
     regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec))
 }
 
 sortMzByRt <- function(data, mzprecision=2)
 {
     mzprec <- 10^mzprecision
-    mzs <- signif(as.numeric(regmatches(rownames(data),
+    mzs <- trunc(as.numeric(regmatches(rownames(data),
     regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec
     rts <- as.numeric(substring(regmatches(rownames(data),
     regexpr("T\\d+(\\.\\d+)?",rownames(data), perl=TRUE)),2))  

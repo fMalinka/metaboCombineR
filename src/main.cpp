@@ -209,13 +209,13 @@ experiment metaboCombineR::generateAlignmentExperiment(int window_size, experime
     {
         if(index2table[irow].first < index2table[irow].second)
         {
-            chmat(irow) = exp2Ref->mzStr[index2table[irow].second] + std::string("T");
+            chmat(irow) = std::string("M") + exp2Ref->mzStr[index2table[irow].second] + std::string("T");
             newMZstr[irow] = exp2Ref->mzStr[index2table[irow].second];
             newMZ(irow) = exp2Ref->mz(index2table[irow].second);
         }
         else
         {
-            chmat(irow) = expNonRef->mzStr[index2table[irow].first] + std::string("T");
+            chmat(irow) = std::string("M") + expNonRef->mzStr[index2table[irow].first] + std::string("T");
             newMZstr[irow] = expNonRef->mzStr[index2table[irow].first];
             newMZ(irow) = expNonRef->mz(index2table[irow].first);
         }
