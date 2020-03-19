@@ -60,7 +60,7 @@ isValid <- function(dataframe)
         pattern = "^M(\\d+|\\d+\\.\\d+)T(\\d+|\\d+\\.\\d+)", mzs))
     valueFormat <- all(sapply(dataframe, is.numeric))
     rowDim <- nrow(dataframe) > 0
-    colDim <- ncol(dataframe) > 0
+    colDim <- ncol(dataframe) > 1
     return(rownameFormat & valueFormat & rowDim & colDim)
 }
 
