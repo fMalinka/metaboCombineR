@@ -22,7 +22,7 @@ For an ilustration, we prepared four authentic real datasets. For loading them t
 > data(metaboExp3)
 > data(metaboExp4)
 ```
-Presented datasets are in metaboAnalyst format where rows represent features and each row has it own name which m/z value is prefixed by `M` and rt by `T`. Columns represent samples.
+Presented datasets are in 2-dimensional matrix format where rows represent features and each row has it own name which m/z value is prefixed by `M` and rt by `T`. Columns represent samples. Names of all samples must be filled by `colnames` function through R. Values of matrix must be in numerical format, not `factor` type.
 
 To combine all of these experiments into one table, call `runMetaboCombiner` function, where the first arguments is supposed to be a list of experiments, `mzprecision` argument defines a number of digits considered for peaks.
 ```
@@ -42,7 +42,7 @@ Malinka, F., Zareie, A., Novosadova, V. Batch alignment via retention orders for
 
 ## Acknowledgments
 
-* asddada
+* Ashkan Zareie for his comments and suggestions.
 
 ## License
 
