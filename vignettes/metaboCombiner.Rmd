@@ -1,11 +1,12 @@
 ---
-title: "metaboCombineR - A package for aligning LC/MS experiments"
+title: "metaboCombineR - A tool for combining untargeted multi-batch
+LC-MS experiments"
 author: "Frantisek Malinka"
 output:
 BiocStyle::html_document:
 toc_float: true
 vignette: >
-%\VignetteIndexEntry{metaboCombineR - A package for aligning LC/MS experiments}
+%\VignetteIndexEntry{metaboCombineR}
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteEncoding{UTF-8}
 %\VignetteDepends{metaboCombineR, BiocStyle}
@@ -30,10 +31,79 @@ library(metaboCombineR)
 **Compiled**: `r date()`
 
 # Introduction
-Intoduction part
 
-#Installation
-How to install this package
+This document describes R package `metaboCombineR` and demonstrates its
+suitability and usage on an authentic untargeted LC-MS dataset. metaboCombineR
+is written in C++ focusing on large-scale untargeted LC-MS experiments.
+The package allowes to preprocessed each batch of samples separately using
+an arbitrary preprocessing program, such as XCMS. The main pros is a possibility
+to handle and observed results of experiments during the time and program
+parameter tuning should be easier since within-batch variablity is smaller
+than beetween-batch variablity. The package suppose only basic R skills.
 
-#Example
-How to work with this project
+# Data format
+
+The input data is simply a list of numerical 2-dimensional matrices
+(`data.frame` structure in R) where rows correspond to LC-MS features and
+columns correspond to samples in the given batch. Therefore, each matrix
+is a result of previously preprocessed samples from a batch. Note that both
+dimensions must be named. Name of columns, samples, is arbitrary. However, name
+of each row, feature,  consist of m/z value and retention time. The m/z value is
+prefixed by `M` and the retention time is prefixed by `T`. For example, a
+feature with m/z value equal 57.08131 and retention time equal 1428.18786 is
+written as `M57.08131T1428.18786`.
+
+## Loading example datasets 
+In this package, we provide four example datasets for demonstrating a
+functionality of implemented method. To load these datasets into your R
+workspace, call `data` function.
+```{r example datasets}
+data(metaboExp1)
+data(metaboExp2)
+data(metaboExp3)
+data(metaboExp4)
+```
+
+Now, all datasets are ready to use. To confirm that datasets are in the
+required format, check the structure of input `data.frame`s. Rows nad columns
+must be named and features must be in the correct format.
+```{r datmatrix example, echo=TRUE}
+head(metaboExp1)
+```
+
+To verify it, we provide three functions: `getMZs`, `getRTs`,
+`sortDataFrameByRt`, and `sortDataFrameByMz`. Obviously from the names,
+`getMZs` function returns a vector of m/z values, `getRTs` function returns
+a vector of values corresponding to retention time.
+
+```{r getRTs and getMZs}
+mzs <- getMZs(metaboExp1, mzprecision = 2)
+rts <- getRTs(metaboExp1)
+head(mzs)
+head(rts)
+```
+
+`sortDataFrameByRt` function returns a data.frame where rows are sorted
+by the corresponding rt values.
+```{r sort data.frame by rt}
+sortedRTdf <- sortDataFrameByRt(metaboExp1, mzprecision = 2)
+head(sortedRTdf)
+```
+
+`sortDataFrameByMz` function returns a data.frame where rows are sorted
+by the corresponding mz/s values.
+```{r sort data.frame by mz}
+sortedMZdf <- sortDataFrameByMz(metaboExp1, mzprecision = 2)
+head(sortedMZdf)
+```
+
+## Run metaboCombineR
+Finally, to run the method called `runMetaboCombiner` which requires 3
+arguments, i.e. `listExperimens` must be a list of data.frames representing
+experiments, `mzprecision`  expressed number of mz digits to be considered
+(default is 3), `windowsize` set up length of subsequences (default is 5).
+
+```{r runall, eval=FALSE}
+runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4),
+mzprecision = 2, windowsize = 5)
+```

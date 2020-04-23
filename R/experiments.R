@@ -11,10 +11,11 @@ sortDataFrameByRt <- function(data, mzprecision=2)
     return(as.matrix(newdata))
 }
 
-sortDataFrameByMz <- function(data)
+sortDataFrameByMz <- function(data, mzprecision=2)
 {    
-    mzs <- as.numeric(regmatches(rownames(data),
-    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))
+    mzprec <- 10^mzprecision
+    mzs <- trunc(as.numeric(regmatches(rownames(data),
+    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec
     
     mzsOrder <- order(mzs)
     newdata <- data[mzsOrder,]
@@ -68,7 +69,7 @@ isValid <- function(dataframe)
     mzs <- rownames(dataframe)
     rownameFormat <- all(grepl(
         pattern = "^M(\\d+|\\d+\\.\\d+)T(\\d+|\\d+\\.\\d+)", mzs))
-    valueFormat <- all(sapply(dataframe, is.numeric))
+    valueFormat <- all(vapply(dataframe, is.numeric, logical(1)))
     rowDim <- nrow(dataframe) > 0
     colDim <- ncol(dataframe) > 1
     return(rownameFormat & valueFormat & rowDim & colDim)
