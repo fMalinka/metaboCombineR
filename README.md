@@ -38,11 +38,11 @@ Then, the result matrix is stored in `mytable` variable.
 Cite please:
 
 
-Malinka, F., Zareie, A., Novosadova, V. Batch alignment via retention orders for improvingthe reliability of untargeted metabolomics. Unpublished.
+Malinka, F., Zareie, A., Novosadova, V. Batch alignment via retention orders for improving the reliability of untargeted metabolomics. Unpublished.
 
 ## Acknowledgments
 
-* Ashkan Zareie for his comments and suggestions.
+* Ashkan Zareie for his considered comments and suggestions.
 
 ## License
 
