@@ -100,6 +100,10 @@ enum direction_tp {to_none, to_down, to_right, to_diagonal};
 
 typedef std::vector<std::vector<m_elemnt> > myALIGN;
 alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::string> *tgt);
+alingmentIndexes processSemiAlignment(mySolution *mysol, std::vector<std::string> *tgt);
 mySolution computeSimilarityMatrix4CompleteSemiglobal(std::list<std::string *> src_profile_mz, std::vector<std::string> *tgt_profile);
 mySolution computeSimilarityMatrix4CompleteLocal(std::list<std::string *> src_profile_mz, std::vector<std::string> *tgt_profile);
 std::vector<std::string> makeAlignment(std::vector<std::string> sample1, std::vector<std::string> sample2, unsigned long FILTER_LIMIT);
+mySolution computeSimilarityMatrix4Complete(std::list<std::string *> src_profile_mz, std::vector<std::string> *tgt_profile);
+
+void printSemiAlignmentToFile(mySolution *mysol, std::vector<std::string> *tgt, std::string filename);
