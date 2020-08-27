@@ -204,7 +204,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
         {
             a1[ial] = "-1";
             onerowalign[ial] = allAlignments->expNonref->mzStr[allAlignments->indexNonref[ial]];
-            reals1index[ial] = -1;
+            //reals1index[ial] = -1;
             ;//Rcpp::Rcout << "-1 ";
         }        
     }
@@ -219,7 +219,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
         }
         else
         {
-            reals2index[ial] = -1;
+            //reals2index[ial] = -1;
             a2[ial] = "-1";
         }
     }
@@ -289,7 +289,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
     //std::vector<std::string> reals2index;
     for(int ii = 0; ii < mz1.size(); ++ii)
     {
-        Rcpp::Rcout << "(" << mz1[ii] << "," << mz2[ii] << " # " << reals1index[atoi(mz1[ii])] << "," << reals2index[atoi(mz2[ii])] << ") ";
+        Rcpp::Rcout << "(" << mz1[ii] << "," << mz2[ii] << " # " << reals1index[atoi(mz1[ii])-1] << "," << reals2index[atoi(mz2[ii])-1] << ") ";
     }
 
     //common elements
@@ -303,7 +303,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
             mypair.second = allAlignments->indexRef[icom];
             mypair.first = allAlignments->indexNonref[icom];
             index.push_back(mypair);
-            Rcpp::Rcout << "first: " << mypair.first << " texxt: " << allAlignments->expRef->mzStr[mypair.first] <<  " second: " << mypair.second << " text: " << allAlignments->expNonref->mzStr[mypair.second] << std::endl;
+            //Rcpp::Rcout << "first: " << mypair.first << " texxt: " << allAlignments->expRef->mzStr[mypair.first] <<  " second: " << mypair.second << " text: " << allAlignments->expNonref->mzStr[mypair.second] << std::endl;
         }
         else if(allAlignments->indexRef[icom] == -1)
         {
@@ -318,10 +318,51 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
             mypair.second = allAlignments->indexRef[icom];
             mypair.first = -1;// allAlignments->indexNonref[icom];
             index.push_back(mypair);
-            Rcpp::Rcout << "n first: " <<allAlignments->indexRef[icom] << " nsecond: " << allAlignments->indexNonref[icom] << std::endl;
+            //Rcpp::Rcout << "n first: " <<allAlignments->indexRef[icom] << " nsecond: " << allAlignments->indexNonref[icom] << std::endl;
         }
     }
-    return index;
+
+    int iindexLast = 0;
+    for(int iswap = 0; iswap < mz1.size(); ++iswap)
+    {
+        //mz1 ref
+        //Rcpp::Rcout << "test: " << index[iswap].second << " test2: " << index[iswap].first << std::endl; //ref
+        //Rcpp::Rcout << "ref swap: " << mz1[iswap] << " nonrefswap: " << mz2[iswap]; //ref
+        //Rcpp::Rcout << "z ref swap: " << index[reals1index[atoi(mz1[iswap])-1]].first << " bude: " << index[reals2index[atoi(mz2[iswap])-1]].first << std::endl;
+        Rcpp::Rcout << "index1 real: " << index[atoi(mz1[iswap])-1].second << " index2 real: " << index[atoi(mz1[iswap])-1].second << " index ref: " << index[reals1index[atoi(mz1[iswap])-1]].first << " a " << index[reals1index[atoi(mz1[iswap])-1]].second << " | " << index[reals2index[atoi(mz2[iswap])-1]].first << " a " << index[reals2index[atoi(mz2[iswap])-1]].second  << std::endl;
+
+         index[atoi(mz1[iswap])-1].first = index[atoi(mz2[iswap])-1].first;
+         index[atoi(mz2[iswap])-1].first = -1;
+         Rcpp::Rcout << "bla: " << index[atoi(mz2[iswap])-1].first << " bla2: " << index[atoi(mz2[iswap])-1].second << std::endl;
+        //Rcpp::Rcout << "reference: " << index[atoi(mz1[iswap])-1].first << " a " << index[atoi(mz1[iswap])-1].second << " non-reference: " << index[atoi(mz2[iswap])-1].first << " a " << index[atoi(mz2[iswap])-1].second << std::endl;
+
+        //reference
+
+
+        //reals1index[atoi(mz1[iswap])-1];
+        //nonreference
+        //reals2index[atoi(mz2[iswap])-1];
+
+        //index[reals1index[atoi(mz1[iswap])-1]].first = index[reals2index[atoi(mz2[iswap])-1]].first;
+        //index[reals2index[atoi(mz2[iswap])-1]].first = -1;
+        //index[atoi(mz2[iswap])].first = -1;
+        //mz2[iswap]; //nonref
+    }
+
+    std::vector<std::pair<int,int> > finalindex;
+    for(int ii = 0; ii < index.size(); ++ii)
+    {
+        Rcpp::Rcout << "A: " << index[ii].first << " B: " << index[ii].second << std::endl;
+        //if(index[ii].first != -1 && index[ii].second != -1)
+        //{
+            finalindex.push_back(index[ii]);
+        //}
+        //if(index[ii].first != -1 && index[ii].first ==
+        ;//index[ii].second;
+    }
+    return finalindex;
+    //            std::vector<std::pair<int,int> > resultsInds;   //nonref, ref
+    //            return resultsInds;
 
 
     //alignment index to sequence index
@@ -439,8 +480,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
     }
     return resultsInds;
     */
-    std::vector<std::pair<int,int> > resultsInds;   //nonref, ref
-    return resultsInds;
+
 }
 
 //functiont that combines two alignments into the final experiment
@@ -632,6 +672,8 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
 
     for(int irow = 0; irow < index2table.size(); ++irow)
     {
+        if(index2table[irow].first == -1 && index2table[irow].second == -1)
+            continue;
         if(index2table[irow].first < index2table[irow].second)
         {
             chmat(irow) = std::string("M") + exp2Ref->mzStr[index2table[irow].second] + std::string("T");
@@ -654,6 +696,8 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
 
     for(int irow = 0; irow < index2table.size(); ++irow)
     {
+        if(index2table[irow].first == -1 && index2table[irow].second == -1)
+            continue;
         for(int icol = 0; icol < expNonRef->experiments.ncol(); ++icol)
         {
             if(index2table[irow].first == -1)
@@ -684,6 +728,8 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
     //add secondly reftable
     for(int irow = 0; irow < index2table.size(); ++irow)
     {
+        if(index2table[irow].first == -1 && index2table[irow].second == -1)
+            continue;
         for(int icol = expNonRef->experiments.ncol(); icol < mat.ncol(); ++icol)
         {
             if(index2table[irow].second == -1)
