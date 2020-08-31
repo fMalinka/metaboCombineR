@@ -475,47 +475,10 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
     return myAlign;
 }
 
-alingmentIndexes processSemiAlignment(mySolution *mysol, std::vector<std::string> *tgt)
+alingmentIndexes processAlignment(mySolution *mysol, std::vector<std::string> *tgt)
 {
     std::vector<int> seq1;
-    std::vector<int> seq2;
-    //std::vector<std::string> src;
-
-    //std::ofstream myfile;
-    //myfile.open(filename);
-
-    //for(std::list<std::string*>::iterator it = mysol->src.profile_mz.begin(); it != mysol->src.profile_mz.end(); ++it)
-    //{
-    //    src.push_back(**it);
-    //}
-
-    //m_elemnt element = mysol->mymatrix[mysol->src.profile_mz.size()][tgt->size()];
-    //find the best in the last row
-    double localbest = DBL_MAX;
-    int bestindex = 0;
-    /*for(int ir = 0; ir < mysol->mymatrix[0].size()-1; ++ir)
-    {
-        Rcpp::Rcout << "score: " << mysol->mymatrix[mysol->mymatrix.size()-2][ir].score << std::endl;
-        if(mysol->mymatrix[mysol->mymatrix.size()-1][ir].score < localbest)
-        {
-            localbest = mysol->mymatrix[mysol->mymatrix.size()-1][ir].score;
-            Rcpp::Rcout << "score: " << localbest << std::endl;
-            bestindex = ir;
-        }
-    }
-    */
-    for(int ir = 0; ir < mysol->mymatrix.size()-1; ++ir)
-    {
-        for(int ic = 0; ic < mysol->mymatrix[0].size()-1; ++ic)
-        {
-            ;//Rcpp::Rcout << mysol->mymatrix[ir][ic].score << " ";
-        }
-        //Rcpp::Rcout << std::endl;
-    }
-
-
-    //m_elemnt element = mysol->mymatrix[mysol->mymatrix.size()-1][bestindex];
-    //m_elemnt element = mysol->mymatrix[mysol->src.profile_mz.size()][tgt->size()];
+    std::vector<int> seq2;    
     m_elemnt element = mysol->mymatrix[mysol->src.profile_mz.size()][tgt->size()];
 
     int iancestor = 0;
@@ -528,7 +491,6 @@ alingmentIndexes processSemiAlignment(mySolution *mysol, std::vector<std::string
         }
         else if(element.direction[iancestor] == from_oposit)
         {
-            //Rcpp::Rcout << "SHODA!" << std::endl;
             seq1.push_back(element.index2s1);
             seq2.push_back(element.index2s2);
         }
@@ -539,8 +501,7 @@ alingmentIndexes processSemiAlignment(mySolution *mysol, std::vector<std::string
         }
         else
         {
-            //seq1.push_back(src[element.index2s1]);
-            //seq2.push_back("-");
+            ;
         }
 
 
@@ -553,26 +514,6 @@ alingmentIndexes processSemiAlignment(mySolution *mysol, std::vector<std::string
     }
     std::reverse(seq1.begin(), seq1.end());
     std::reverse(seq2.begin(), seq2.end());
-//horizontal
-//    for(int ii = 0; ii < seq1.size(); ++ii)
-//    {
-//        std::cout << seq1[ii] << " ";
-//    }
-//    std::cout << std::endl;
-//    for(int ii = 0; ii < seq2.size(); ++ii)
-//    {
-//        std::cout << seq2[ii] << " ";
-//    }
-//    std::cout << std::endl;
-
-    //vertikal
-//    std::cout << "VERTIKAL: " << std::endl;
-//    for(int ii = 0; ii < seq1.size(); ++ii)
-//    {
-//        myfile << seq1[ii] << "," << seq2[ii];
-//        myfile << std::endl;
-//    }
-//    myfile.close();
 
     alingmentIndexes myAlign;
     myAlign.indexNonref = seq1;

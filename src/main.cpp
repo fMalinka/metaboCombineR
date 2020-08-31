@@ -392,11 +392,10 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
 
     mySolution rowAlign = computeSimilarityMatrix4Complete((nonrefmzStr), &(exp2Ref->mzStr));//computeSimilarityMatrix4CompleteSemiglobal((nonrefmzStr), &(exp2Ref->mzStr));
     //mySolution rowAlign = computeSimilarityMatrix4CompleteSemiglobal((nonrefmzStr), &(exp2Ref->mzStr));
-    std::string file= "myfile.log";
-    printSemiAlignmentToFile(&rowAlign, &(exp2Ref->mzStr), file);
+    //std::string file= "myfile.log";
+    //printSemiAlignmentToFile(&rowAlign, &(exp2Ref->mzStr), file);
 
-    //NAHRADIT SEMIGLOBAL rekonstrukci!!!!!!!!
-    alingmentIndexes resAlign = processSemiAlignment(&rowAlign, &(exp2Ref->mzStr));
+    alingmentIndexes resAlign = processAlignment(&rowAlign, &(exp2Ref->mzStr));
     resAlign.expNonref = expNonRef;
     resAlign.expRef = exp2Ref;
     resAlign.startRow = 0;

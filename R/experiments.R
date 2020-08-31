@@ -88,8 +88,8 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 3, windowsize = 5, a
     }
     else
     {
-        algorithm="kmer"
         message(paste0("algorithm parameter '", algorithm, "' is unknown. Default is kmer."))
+        algorithm="kmer"
         message("Algorithm: kmersAlignment")
     }
     myclass <- new(metaboCombineR)
@@ -132,39 +132,6 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 3, windowsize = 5, a
     return(finalmatrix)
 }
 
-correctClassiqAling <- function(clasiqVector, orderLimit = 50)
-{
-  correctedClasiqVector <- vector()
-  #swapDistance <- vector()
-  swapIndex1 <- vector()
-  swapIndex2 <- vector()
-  #swappedDistanceIndex <- vector()
-  #orderLimit <- 50
-  for(iclasiq in 1:(length(clasiqVector)))
-  {
-    if(clasiqVector[iclasiq] != "-")
-    {
-      correctedClasiqVector <- append(correctedClasiqVector, clasiqVector[iclasiq])
-      if(iclasiq < length(clasiqVector))
-      {
-        if(clasiqVector[iclasiq] %in% clasiqVector[(iclasiq+1):min((iclasiq+orderLimit), length(clasiqVector))])
-        {
-          #swapDistance <- append(swapDistance, which(clasiqVector[iclasiq] == clasiqVector[(iclasiq+1):min((iclasiq+orderLimit), length(clasiqVector))]))
-          thesameInd <- which(clasiqVector[iclasiq] == clasiqVector[(iclasiq+1):min((iclasiq+orderLimit), length(clasiqVector))])
-          #clasiqVector[thesameInd + iclasiq] <- "-"
-          #iclasiq <- append(iclasiq, iclasiq)
-          #swappedDistanceIndex <- append(swappedDistanceIndex, c(thesameInd + iclasiq, iclasiq))
-          swapIndex2 <- append(swapIndex2, thesameInd + iclasiq)
-          swapIndex1 <- append(swapIndex1, iclasiq)
-        }
-      }
-    }
-  }
-  #swappedDistanceIndex <- sort(unique(swappedDistanceIndex))
-  #swappedDistanceIndex <- swappedDistanceIndex[swappedDistanceIndex <= length(clasiqVector)]
-  return(list(swapIndex1, swapIndex2))
-}
-
 correctClassiqAling2 <- function(mzvect1, mzvect2, orderLimit = 50)
 {
   swapIndex1 <- vector()
@@ -179,11 +146,8 @@ correctClassiqAling2 <- function(mzvect1, mzvect2, orderLimit = 50)
       {
         if(mzvect2[i] %in% mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
         {
-          #swapDistance <- append(swapDistance, which(clasiqVector[iclasiq] == clasiqVector[(iclasiq+1):min((iclasiq+orderLimit), length(clasiqVector))]))
           thesameInd <- which(mzvect2[i] == mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
           mzvect1[thesameInd + i] <- "-1"
-          #iclasiq <- append(iclasiq, iclasiq)
-          #swappedDistanceIndex <- append(swappedDistanceIndex, c(thesameInd + iclasiq, iclasiq))
           swapIndex2 <- append(swapIndex2, i)
           swapIndex1 <- append(swapIndex1, thesameInd + i)
         }
@@ -192,11 +156,8 @@ correctClassiqAling2 <- function(mzvect1, mzvect2, orderLimit = 50)
       {
         if(mzvect1[i] %in% mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
         {
-          #swapDistance <- append(swapDistance, which(clasiqVector[iclasiq] == clasiqVector[(iclasiq+1):min((iclasiq+orderLimit), length(clasiqVector))]))
           thesameInd <- which(mzvect1[i] == mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
           mzvect2[thesameInd + i] <- "-1"
-          #iclasiq <- append(iclasiq, iclasiq)
-          #swappedDistanceIndex <- append(swappedDistanceIndex, c(thesameInd + iclasiq, iclasiq))
           swapIndex2 <- append(swapIndex2, thesameInd + i)
           swapIndex1 <- append(swapIndex1, i)
         }
