@@ -76,7 +76,7 @@ isValid <- function(dataframe)
 }
 
 
-runMetaboCombiner <- function(listExperimens, mzprecision = 3, windowsize = 5, algorithm="kmer")
+runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, algorithm="kmer")
 {
     if(algorithm == "rtcor")
     {
@@ -94,9 +94,23 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 3, windowsize = 5, a
     }
     myclass <- new(metaboCombineR)
     ilist  <- 1
+    isGroup <- rep(FALSE, length(listExperimens))
     listValid <- rep(FALSE, length(listExperimens))
+    listGroup <- vector(mode = "list", length = length(listExperimens))
     for(elist in listExperimens)
     {
+      #group row present
+        if(grepl("group", rownames(elist)[1], ignore.case=TRUE))
+        {
+          listGroup[ilist] <- list(elist[1,])
+          elist <- elist[-1,]
+          isGroup[ilist] <- TRUE
+        }
+        orn <- rownames(elist)
+        elist <- apply(apply(elist,2, as.character), 2, as.numeric)
+        rownames(elist) <- orn
+        elist <- as.data.frame(elist)
+        listExperimens[[ilist]] <- elist
         if(isValid(elist))
         {
             write(paste0("experiment n.", ilist, " has ", ncol(elist),
@@ -111,17 +125,41 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 3, windowsize = 5, a
         }
         ilist <- ilist + 1
     }
-    if(all(listValid))
+    if(!all(isGroup))
+    {
+        write(paste0("There are inconsistencies in GROUP labels. The GROUP label is missing in experiments no., ", which(isGroup == FALSE), "."),
+              stderr())
+    }
+    else if(all(listValid))
     {
         if(algorithm == "kmer")
         {
-            finalmatrix <- myclass$run(listExperimens, mzprecision, windowsize)
+			if(windowsize <=3 | windowsize >= min(sapply(listExperimens, nrow)))
+			{
+				write(paste0("ERROR: windowsize parameter is out of range!"), stderr())
+		        finalmatrix  <- NULL
+			} else
+			{
+            	finalmatrix <- myclass$run(listExperimens, mzprecision, windowsize)
+			}
         }
         else
         {
-            rtwindowsize <- 50;
-            finalmatrix <- myclass$runRT(listExperimens, mzprecision, rtwindowsize)
+			if(windowsize <=1 | windowsize >= min(sapply(listExperimens, nrow)))
+			{
+				write(paste0("ERROR: windowsize parameter is out of range!"), stderr())
+		        finalmatrix  <- NULL
+			} else
+			{
+            	finalmatrix <- myclass$runRT(listExperimens, mzprecision, windowsize)
+			}
         }
+        
+        if(all(isGroup))
+        {
+			gorder <- myclass$getAlignmentOrder()
+			finalmatrix <- rbind(group = unlist(unlist(listGroup[gorder+1])), finalmatrix)
+		}
     }
     else
     {
@@ -146,7 +184,8 @@ correctClassiqAling2 <- function(mzvect1, mzvect2, orderLimit = 50)
       {
         if(mzvect2[i] %in% mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
         {
-          thesameInd <- which(mzvect2[i] == mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
+          #thesameInd <- which(mzvect2[i] == mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
+            thesameInd <- which(mzvect2[i] == mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])[1]
           mzvect1[thesameInd + i] <- "-1"
           swapIndex2 <- append(swapIndex2, i)
           swapIndex1 <- append(swapIndex1, thesameInd + i)
@@ -156,7 +195,8 @@ correctClassiqAling2 <- function(mzvect1, mzvect2, orderLimit = 50)
       {
         if(mzvect1[i] %in% mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
         {
-          thesameInd <- which(mzvect1[i] == mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
+          #thesameInd <- which(mzvect1[i] == mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
+            thesameInd <- which(mzvect1[i] == mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])[1]
           mzvect2[thesameInd + i] <- "-1"
           swapIndex2 <- append(swapIndex2, thesameInd + i)
           swapIndex1 <- append(swapIndex1, i)

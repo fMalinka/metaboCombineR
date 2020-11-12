@@ -15,18 +15,6 @@ int s_dismatch = -500000;//std::numeric_limits<int>::min();
 int s_del = 1;
 int s_ins = 1;
 
-void printMatrix(double *matrix, int nrow, int ncol)
-{
-    for(int x = 0; x < nrow*ncol; ++x)
-    {
-        if(x % ncol ==0)
-            Rcpp::Rcout << std::endl;
-
-            Rcpp::Rcout << matrix[x] <<",";
-
-    }
-}
-
 mySolution computeSimilarityMatrix4CompleteSemiglobal(std::list<std::string *> src_profile_mz, std::vector<std::string> *tgt_profile)
 {
     //KONTROLA CO JE X A CO Y???!!!!! - dle vysledku prvni souradnice je horizontal (sloupce)
@@ -101,7 +89,7 @@ mySolution computeSimilarityMatrix4CompleteSemiglobal(std::list<std::string *> s
 
     unsigned long x = 1;
 
-    for(x; x <= dimX; ++x)
+    for(; x <= dimX; ++x)
     {
         for(unsigned long y = 1; y <= dimY; ++y)
         {
@@ -240,7 +228,7 @@ mySolution computeSimilarityMatrix4Complete(std::list<std::string *> src_profile
 
     unsigned long x = 1;
 
-    for(x; x <= dimX; ++x)
+    for(; x <= dimX; ++x)
     {
         for(unsigned long y = 1; y <= dimY; ++y)
         {
@@ -356,7 +344,7 @@ mySolution computeSimilarityMatrix4CompleteLocal(std::list<std::string *> src_pr
     int shoda = 0;   
     unsigned long x = 1;
 
-    for(x; x <= dimX; ++x)
+    for(; x <= dimX; ++x)
     {
         for(unsigned long y = 1; y <= dimY; ++y)
         {
@@ -421,7 +409,7 @@ alingmentIndexes processLocalAlignments(mySolution *mysol, std::vector<std::stri
     double localbest = DBL_MIN;
     int besttgt = 0;
     m_elemnt element;
-    for(int ibest = 0; ibest <= tgt->size(); ++ibest)
+    for(unsigned long ibest = 0; ibest <= tgt->size(); ++ibest)
     {
         if(mysol->mymatrix[mysol->src.profile_mz.size()][ibest].score > localbest)
         {
@@ -585,7 +573,7 @@ void printSemiAlignmentToFile(mySolution *mysol, std::vector<std::string> *tgt, 
 
     //vertikal
 //    std::cout << "VERTIKAL: " << std::endl;
-    for(int ii = 0; ii < seq1.size(); ++ii)
+    for(unsigned long int ii = 0; ii < seq1.size(); ++ii)
     {
         myfile << seq1[ii] << "," << seq2[ii];
         myfile << std::endl;

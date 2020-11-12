@@ -32,6 +32,7 @@ public:
     Rcpp::NumericMatrix runRT(Rcpp::List allExps, int mzprecision, int rtwindowsize);
     void combineExperiments();
     Rcpp::NumericMatrix getfinalMatrix();
+    std::vector<int> getAlignmentOrder() {return this->alignmentOrder;}
 
 private:
     std::vector<experiment> experiments;
@@ -41,7 +42,8 @@ private:
     experiment generateAlignmentExperiment(int window_size, experiment *expNonRef, experiment *exp2Ref);
     experiment generateAlignmentExperimentRT(int window_size, experiment *expNonRef, experiment *exp2Ref);
     double getSimilarity(experiment *first, experiment *second);
-    std::pair<int, int> findTheMostSimilar(std::vector<experiment> *multiAlignmentExperiment);
+    std::pair<unsigned long, unsigned long> findTheMostSimilar(std::vector<experiment> *multiAlignmentExperiment);
+    std::vector<int> alignmentOrder;
 };
 
 
@@ -52,6 +54,7 @@ RCPP_MODULE(metaboCombineR){
     .constructor()
     .method("run", &metaboCombineR::run, "get the message")
     .method("runRT", &metaboCombineR::runRT, "get the message")
+    .method("getAlignmentOrder", &metaboCombineR::getAlignmentOrder, "return the order of alignment")
     ;
 }
 
@@ -63,9 +66,9 @@ std::vector<std::pair<int,int> > metaboCombineR::aggregateAlignments(std::vector
     std::vector<std::vector<int> > commonIndexesRefCandidates((*allAlignments)[0].expRef->mz.size());
     std::vector<int> commonIndexesRef((*allAlignments)[0].expRef->mz.size(), -1);
 
-    for(int iali = 0; iali < allAlignments->size(); ++iali)
+    for(unsigned long iali = 0; iali < allAlignments->size(); ++iali)
     {
-        for(int irow = 0; irow < (*allAlignments)[iali].indexRef.size(); ++irow)
+        for(unsigned long irow = 0; irow < (*allAlignments)[iali].indexRef.size(); ++irow)
         {
             if((*allAlignments)[iali].indexRef[irow] != -1 && (*allAlignments)[iali].indexNonref[irow] != -1)
             {
@@ -75,12 +78,12 @@ std::vector<std::pair<int,int> > metaboCombineR::aggregateAlignments(std::vector
 
         }
     }
-    for(int iref = 0; iref < commonIndexesRefCandidates.size(); ++iref)
+    for(unsigned long iref = 0; iref < commonIndexesRefCandidates.size(); ++iref)
     {
         if(!commonIndexesRefCandidates[iref].empty())
         {
             std::map<std::string,std::vector<int> > majorityVote; //mz value, commonIndexesRef
-            for(int icand = 0; icand < commonIndexesRefCandidates[iref].size(); ++icand)
+            for(unsigned long icand = 0; icand < commonIndexesRefCandidates[iref].size(); ++icand)
             {
                 majorityVote[(*allAlignments)[0].expNonref->rtStr[commonIndexesRefCandidates[iref][icand]]].push_back(commonIndexesRefCandidates[iref][icand]);
             }
@@ -88,7 +91,7 @@ std::vector<std::pair<int,int> > metaboCombineR::aggregateAlignments(std::vector
             std::map<std::string,std::vector<int> >::iterator it;
 
             std::string bestCand;
-            int bestCandvotes = 0;
+            unsigned long bestCandvotes = 0;
             double mindistance = 100000;
             for (it = majorityVote.begin(); it != majorityVote.end(); it++)
             {
@@ -118,7 +121,7 @@ std::vector<std::pair<int,int> > metaboCombineR::aggregateAlignments(std::vector
     }
     std::vector<int> missingNonref(commonIndexesRef.size(), -1);
     std::map<int, bool> missingNonrefOccurance;
-    for(int ires = 0; ires < commonIndexesRef.size(); ++ires)
+    for(unsigned long ires = 0; ires < commonIndexesRef.size(); ++ires)
     {
         if(commonIndexesRef[ires] != -1)
         {         
@@ -128,15 +131,15 @@ std::vector<std::pair<int,int> > metaboCombineR::aggregateAlignments(std::vector
     }
 
     std::vector<int> missingNonrefInd;
-    for(int ic = 0; ic < (*allAlignments)[0].expNonref->mzStr.size(); ++ic)
+    for(unsigned long ic = 0; ic < (*allAlignments)[0].expNonref->mzStr.size(); ++ic)
     {
         if(missingNonrefOccurance.find(ic) == missingNonrefOccurance.end())
         {
             missingNonrefInd.push_back(ic);
         }
     }
-    int mnmislastid = 0;//0;
-    for(int ires = 0; ires < commonIndexesRef.size(); ++ires)
+    unsigned long mnmislastid = 0;//0;
+    for(unsigned long ires = 0; ires < commonIndexesRef.size(); ++ires)
     {
         if(commonIndexesRef[ires] != -1)
         {            
@@ -164,7 +167,7 @@ std::vector<std::pair<int,int> > metaboCombineR::aggregateAlignments(std::vector
             resultsInds.push_back(std::pair<int,int>(-1, ires));
         }        
     }
-    for(int ires = mnmislastid; ires < missingNonrefInd.size(); ++ires)
+    for(unsigned long ires = mnmislastid; ires < missingNonrefInd.size(); ++ires)
     {
         resultsInds.push_back(std::pair<int,int>(missingNonrefInd[ires], -1));    
     }
@@ -184,8 +187,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
     int realindex2 = 0;
     std::vector<int> reals1index(allAlignments->indexRef.size());
     std::vector<int> reals2index(allAlignments->indexRef.size());
-
-    for(int ial = 0; ial < allAlignments->indexRef.size(); ++ial)
+    for(unsigned long ial = 0; ial < allAlignments->indexRef.size(); ++ial)
     {
         if(allAlignments->indexRef[ial] != -1)
         {
@@ -200,8 +202,7 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
             onerowalign[ial] = allAlignments->expNonref->mzStr[allAlignments->indexNonref[ial]];            
         }        
     }
-
-    for(int ial = 0; ial < allAlignments->indexNonref.size(); ++ial)
+    for(unsigned long ial = 0; ial < allAlignments->indexNonref.size(); ++ial)
     {
         if(allAlignments->indexNonref[ial] != -1)
         {
@@ -218,14 +219,12 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
     //Rcpp::Function correctClassiqAling("correctClassiqAling");
     //Rcpp::List listRTcorrected = correctClassiqAling(onerowalign, rtwindowsize);
 
-
     Rcpp::Function correctClassiqAling2("correctClassiqAling2");
     Rcpp::List listRTcorrected2 = correctClassiqAling2(a1, a2, rtwindowsize);
     Rcpp::CharacterVector mz1 = listRTcorrected2[0];
     Rcpp::CharacterVector mz2 = listRTcorrected2[1];
-
     //common elements
-    for(int icom = 0; icom < allAlignments->indexRef.size(); ++icom)
+    for(unsigned long icom = 0; icom < allAlignments->indexRef.size(); ++icom)
     {
         if(allAlignments->indexRef[icom] != -1 && allAlignments->indexNonref[icom] != -1)
         {
@@ -249,15 +248,13 @@ std::vector<std::pair<int,int> > metaboCombineR::rtcorrection(alingmentIndexes *
             index.push_back(mypair);
         }
     }
-
     for(int iswap = 0; iswap < mz1.size(); ++iswap)
-    {        
+    {
          index[atoi(mz1[iswap])-1].first = index[atoi(mz2[iswap])-1].first;
          index[atoi(mz2[iswap])-1].first = -1;
     }
-
     std::vector<std::pair<int,int> > finalindex;
-    for(int ii = 0; ii < index.size(); ++ii)
+    for(unsigned long ii = 0; ii < index.size(); ++ii)
     {
         finalindex.push_back(index[ii]);
     }
@@ -282,7 +279,7 @@ experiment metaboCombineR::generateAlignmentExperiment(int window_size, experime
 
 
     std::vector<alingmentIndexes> allAlignments;
-    for(int isample = 0; isample < mysamples_windows.size(); ++isample)
+    for(unsigned long isample = 0; isample < mysamples_windows.size(); ++isample)
     {
         std::list<std::string*> rowsrc_profile_mz;
         for(unsigned long irow = 0; irow < mysamples_windows[isample].size(); ++irow)
@@ -303,7 +300,7 @@ experiment metaboCombineR::generateAlignmentExperiment(int window_size, experime
     //add rownames
     std::vector<std::string> newMZstr(index2table.size());
     Rcpp::NumericVector newMZ(index2table.size(), 0);
-    for(int irow = 0; irow < index2table.size(); ++irow)
+    for(unsigned long irow = 0; irow < index2table.size(); ++irow)
     {
         if(index2table[irow].first < index2table[irow].second)
         {
@@ -323,7 +320,7 @@ experiment metaboCombineR::generateAlignmentExperiment(int window_size, experime
     //add first nonreftable
     std::vector<std::string> newRTstr(index2table.size());
     Rcpp::NumericVector newRT(index2table.size(), 0);
-    for(int irow = 0; irow < index2table.size(); ++irow)
+    for(unsigned long irow = 0; irow < index2table.size(); ++irow)
     {
         for(int icol = 0; icol < expNonRef->experiments.ncol(); ++icol)
         {
@@ -353,7 +350,7 @@ experiment metaboCombineR::generateAlignmentExperiment(int window_size, experime
         newRTstr[irow] = rt2str.str();
     }
     //add secondly reftable
-    for(int irow = 0; irow < index2table.size(); ++irow)
+    for(unsigned long irow = 0; irow < index2table.size(); ++irow)
     {
         for(int icol = expNonRef->experiments.ncol(); icol < mat.ncol(); ++icol)
         {
@@ -376,6 +373,7 @@ experiment metaboCombineR::generateAlignmentExperiment(int window_size, experime
     toReturn.rt = newRT;
     toReturn.rtStr = newRTstr;
     toReturn.colnames = chcolnames;
+    toReturn.experimentID = -1;	//minus one -> multiple alingnment
     return toReturn;
 }
 
@@ -384,22 +382,19 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
 {
 
     std::list<std::string *> nonrefmzStr;
-    for(int il = 0; il < expNonRef->mzStr.size(); ++il)
+    for(unsigned long il = 0; il < expNonRef->mzStr.size(); ++il)
     {
         nonrefmzStr.push_back(&(expNonRef->mzStr[il]));
     }
-
 
     mySolution rowAlign = computeSimilarityMatrix4Complete((nonrefmzStr), &(exp2Ref->mzStr));//computeSimilarityMatrix4CompleteSemiglobal((nonrefmzStr), &(exp2Ref->mzStr));
     //mySolution rowAlign = computeSimilarityMatrix4CompleteSemiglobal((nonrefmzStr), &(exp2Ref->mzStr));
     //std::string file= "myfile.log";
     //printSemiAlignmentToFile(&rowAlign, &(exp2Ref->mzStr), file);
-
     alingmentIndexes resAlign = processAlignment(&rowAlign, &(exp2Ref->mzStr));
     resAlign.expNonref = expNonRef;
     resAlign.expRef = exp2Ref;
     resAlign.startRow = 0;
-
 
     std::vector<std::pair<int,int> > index2table = rtcorrection(&resAlign, window_size); //nonref, ref
 
@@ -410,8 +405,7 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
     std::vector<std::string> newMZstr(index2table.size());
     Rcpp::NumericVector newMZ(index2table.size(), 0);
 
-
-    for(int irow = 0; irow < index2table.size(); ++irow)
+    for(unsigned long irow = 0; irow < index2table.size(); ++irow)
     {
         if(index2table[irow].first == -1 && index2table[irow].second == -1)
             continue;
@@ -428,14 +422,13 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
             newMZ(irow) = expNonRef->mz(index2table[irow].first);
         }
     }
-
     Rcpp::rownames(mat) = chmat;
     //add first nonreftable
     std::vector<std::string> newRTstr(index2table.size());
     Rcpp::NumericVector newRT(index2table.size(), 0);
 
 
-    for(int irow = 0; irow < index2table.size(); ++irow)
+    for(unsigned long irow = 0; irow < index2table.size(); ++irow)
     {
         if(index2table[irow].first == -1 && index2table[irow].second == -1)
             continue;
@@ -468,7 +461,7 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
     }
     //add secondly reftable
     int matnewsize = 0;
-    for(int irow = 0; irow < index2table.size(); ++irow)
+    for(unsigned long irow = 0; irow < index2table.size(); ++irow)
     {
         if(index2table[irow].first == -1 && index2table[irow].second == -1)
             continue;
@@ -494,7 +487,7 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
      Rcpp::NumericVector newMZ2(matnewsize);
 
      int inewrow = 0;
-     for(int irow = 0; irow < index2table.size(); ++irow)
+     for(unsigned long irow = 0; irow < index2table.size(); ++irow)
      {
          if(index2table[irow].first != -1 || index2table[irow].second != -1)
          {
@@ -507,7 +500,6 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
             ++inewrow;
          }
      }
-
      Rcpp::colnames(mat2) = chcolnames; //ok
      Rcpp::rownames(mat2) = chmat2;
      experiment toReturn;
@@ -518,6 +510,7 @@ experiment metaboCombineR::generateAlignmentExperimentRT(int window_size, experi
      toReturn.rt = newRT2;  //ok
      toReturn.rtStr = newRTstr2;    //ok
      toReturn.colnames = chcolnames;    //ok
+     toReturn.experimentID = -1;	//minus one -> multiple alingnment
 
     return toReturn;
 }
@@ -530,12 +523,12 @@ double metaboCombineR::getSimilarity(experiment *first, experiment *second)
     std::vector<std::string> myintersection;
     int intersectionCount = 0;
     //histogram1
-    for(int ife = 0; ife < first->mzStr.size(); ++ife)
+    for(unsigned long ife = 0; ife < first->mzStr.size(); ++ife)
     {
         hist1[first->mzStr[ife]]++;
     }
     //histogram2
-    for(int ise = 0; ise < second->mzStr.size(); ++ise)
+    for(unsigned long ise = 0; ise < second->mzStr.size(); ++ise)
     {
         hist2[second->mzStr[ise]]++;
         if(hist1.find(second->mzStr[ise]) != hist1.end())
@@ -547,7 +540,7 @@ double metaboCombineR::getSimilarity(experiment *first, experiment *second)
 
 
     double score = first->mzStr.size() + second->mzStr.size() - (2*intersectionCount);
-    for(int icommon = 0; icommon < myintersection.size(); ++icommon)
+    for(unsigned long icommon = 0; icommon < myintersection.size(); ++icommon)
     {
         score += std::abs(hist1[myintersection[icommon]] - hist2[myintersection[icommon]]);
     }
@@ -555,14 +548,14 @@ double metaboCombineR::getSimilarity(experiment *first, experiment *second)
 }
 
 //compute the similarity for each experiment in vector and returns positions of the best
-std::pair<int, int> metaboCombineR::findTheMostSimilar(std::vector<experiment> *multiAlignmentExperiment)
+std::pair<unsigned long, unsigned long> metaboCombineR::findTheMostSimilar(std::vector<experiment> *multiAlignmentExperiment)
 {
     double bestscore = DBL_MAX;
-    int indNonREF;
-    int indREF;
-    for(int irow = 0; irow < multiAlignmentExperiment->size(); ++irow)
+    int indNonREF = 0;
+    int indREF = 0;
+    for(unsigned long irow = 0; irow < multiAlignmentExperiment->size(); ++irow)
     {
-        for(int icol = irow+1; icol < multiAlignmentExperiment->size(); ++icol)
+        for(unsigned long icol = irow+1; icol < multiAlignmentExperiment->size(); ++icol)
         {
             double score = getSimilarity(&((*multiAlignmentExperiment)[irow]), &((*multiAlignmentExperiment)[icol]));            
             if(score < bestscore)
@@ -604,7 +597,7 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
         newExp.rt = getRTsR(originalDataFrame);
         newExp.mz = getMZsR(originalDataFrame, mzprecision);
 
-        newExp.experimentID.push_back(iexp);
+        newExp.experimentID = iexp;
         newExp.mzStr.resize(newExp.rt.size());
         newExp.rtStr.resize(newExp.rt.size());
         newExp.profile_indexes.resize(newExp.rt.size());
@@ -645,10 +638,11 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
     Rcpp::Rcout << "Working .";
     do
     {
-        std::pair<int, int> mostsimilar = findTheMostSimilar(&multiAlignmentExperiment);
+        std::pair<unsigned long, unsigned long> mostsimilar = findTheMostSimilar(&multiAlignmentExperiment);
+        //multiAlignmentExperiment[mostsimilar.first].experimentID
         Rcpp::Rcout << ".";        
         std::vector<experiment> newExp;
-        for(int iel = 0; iel < multiAlignmentExperiment.size(); ++iel)
+        for(unsigned long iel = 0; iel < multiAlignmentExperiment.size(); ++iel)
         {
             if(iel != mostsimilar.first && iel != mostsimilar.second)
             {
@@ -656,6 +650,15 @@ Rcpp::NumericMatrix metaboCombineR::run(Rcpp::List allExps, int mzprecision, int
             }
         }
         newExp.push_back(generateAlignmentExperiment(window_size, &(multiAlignmentExperiment[mostsimilar.first]), &(multiAlignmentExperiment[mostsimilar.second])));
+        
+        if(multiAlignmentExperiment[mostsimilar.first].experimentID >= 0)
+        {
+			this->alignmentOrder.push_back(multiAlignmentExperiment[mostsimilar.first].experimentID);
+		}
+		if(multiAlignmentExperiment[mostsimilar.second].experimentID >= 0)
+        {
+			this->alignmentOrder.push_back(multiAlignmentExperiment[mostsimilar.second].experimentID);
+		}
         multiAlignmentExperiment = newExp;        
     } while(multiAlignmentExperiment.size() > 1);
 
@@ -680,7 +683,7 @@ Rcpp::NumericMatrix metaboCombineR::runRT(Rcpp::List allExps, int mzprecision, i
         newExp.rt = getRTsR(originalDataFrame);
         newExp.mz = getMZsR(originalDataFrame, mzprecision);
 
-        newExp.experimentID.push_back(iexp);
+        newExp.experimentID = iexp;
         newExp.mzStr.resize(newExp.rt.size());
         newExp.rtStr.resize(newExp.rt.size());
         newExp.profile_indexes.resize(newExp.rt.size());
@@ -721,17 +724,34 @@ Rcpp::NumericMatrix metaboCombineR::runRT(Rcpp::List allExps, int mzprecision, i
     Rcpp::Rcout << "Working .";
     do
     {
-        std::pair<int, int> mostsimilar = findTheMostSimilar(&multiAlignmentExperiment);
+        std::pair<unsigned long, unsigned long> mostsimilar = findTheMostSimilar(&multiAlignmentExperiment);
         Rcpp::Rcout << ".";
         std::vector<experiment> newExp;
-        for(int iel = 0; iel < multiAlignmentExperiment.size(); ++iel)
+        for(unsigned long iel = 0; iel < multiAlignmentExperiment.size(); ++iel)
         {
             if(iel != mostsimilar.first && iel != mostsimilar.second)
             {
                 newExp.push_back(multiAlignmentExperiment[iel]);
             }
         }
-        newExp.push_back(generateAlignmentExperimentRT(window_size, &(multiAlignmentExperiment[mostsimilar.first]), &(multiAlignmentExperiment[mostsimilar.second])));
+        if(multiAlignmentExperiment[mostsimilar.first].mzStr.size() < multiAlignmentExperiment[mostsimilar.second].mzStr.size())
+        {
+            newExp.push_back(generateAlignmentExperimentRT(window_size, &(multiAlignmentExperiment[mostsimilar.first]), &(multiAlignmentExperiment[mostsimilar.second])));
+        }
+        else
+        {
+            newExp.push_back(generateAlignmentExperimentRT(window_size, &(multiAlignmentExperiment[mostsimilar.second]), &(multiAlignmentExperiment[mostsimilar.first])));
+        }
+
+
+        if(multiAlignmentExperiment[mostsimilar.first].experimentID >= 0)
+        {
+			this->alignmentOrder.push_back(multiAlignmentExperiment[mostsimilar.first].experimentID);
+		}
+		if(multiAlignmentExperiment[mostsimilar.second].experimentID >= 0)
+        {
+			this->alignmentOrder.push_back(multiAlignmentExperiment[mostsimilar.second].experimentID);
+		}
         multiAlignmentExperiment = newExp;
     } while(multiAlignmentExperiment.size() > 1);
 

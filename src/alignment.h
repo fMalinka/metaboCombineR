@@ -42,7 +42,7 @@ struct m_elemnt
 //structure representing the input experiment
 typedef struct
 {
-    std::vector<int> experimentID;
+    int experimentID;
     Rcpp::NumericMatrix experiments;
     Rcpp::NumericVector mz;
     Rcpp::NumericVector rt;
