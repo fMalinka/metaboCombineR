@@ -125,9 +125,9 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, a
         }
         ilist <- ilist + 1
     }
-    if(!all(isGroup))
+    if(!(all(isGroup)|(all(!isGroup))))
     {
-        write(paste0("There are inconsistencies in GROUP labels. The GROUP label is missing in experiments no., ", which(isGroup == FALSE), "."),
+        write(paste0("There are inconsistencies in GROUP labels. The GROUP label is missing in experiments no. ", paste0(which(isGroup == FALSE), collapse=","), "."),
               stderr())
     }
     else if(all(listValid))
