@@ -26,13 +26,13 @@ Presented datasets are in 2-dimensional matrix format where rows represent featu
 
 MetaboCombineR enables to define assignments of samples to some group, typically as treatment and control groups. To provide this information, add a vector of assignments as the first row to the input `data.frame`. The row must be named as `group`. If the group label is present in a dataset it must be present in all other datasets. Inconsistencies are not allowed. An example of dataset with three samples (two treatments and one control) and 2 features is depicted below.
 
-```
+
 | | X064.EPK83_m_Mzb1_ESI.mzML | X064.EPK88_m_Mzb1_ESI.mzML | X064.EPK94_m_Mzb1_ESI.mzML |
 |---|---|---|---|
 | group | treatment | treatment | control |
 | M57.08131T1428.18786 | -0.321542424867644 | 0.286250559905367 | 1.17078411764221 |
 | M57.23559T1428.09065 | 0.408813652123444 | -1.0100177456997 | -0.153473421445439 |
-```
+
 
 To combine all of these experiments into one table, call `runMetaboCombiner` function, where the first arguments is supposed to be a list of experiments, `mzprecision` argument defines a number of digits considered for peaks, and `algorithm` selects one of the proposed algorithms. The `algorithm` argument supposes only two values on input: kmer and rtcor. The default algorithm is kmersAlignment. `windowsize` argument represents the size of the window for `rtcorrectedAlignment` algorithm. For `kmersAlignment` algorithm, the same argument represents the k-mer value.
 ```
