@@ -7,7 +7,7 @@ metaboCombineR is R package written in C++ that focuses on large-scale untargete
 ### Prerequisites
 Only one external R package is required: `Rcpp (>= 0.12.16)`. For compiling vignette we suggest `rmarkdown` package.
 ### Installing
-The simplest way to install metaboCombineR package is via `devtools` that allowes to download and install the project instantly from gitHub using only one command.
+The simplest way to install metaboCombineR package is via `devtools` that allowes to download and install the project instantly from gitHub using only one command. For the package installation, run `R` and type:
 ```
 library(devtools)
 install_github("fmalinka/metaboCombineR")
