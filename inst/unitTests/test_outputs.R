@@ -1,0 +1,71 @@
+test_outputs_rtcor <- function()
+{
+    data(metaboExp1)
+    data(metaboExp2)
+    data(metaboExp3)
+    data(metaboExp4)
+    
+    rt1 <- runMetaboCombiner(list(metaboExp1, metaboExp1), algorithm = "rtcor", windowsize = 0, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp1)), getMZs(rt1))
+    rt2 <- runMetaboCombiner(list(metaboExp2, metaboExp2), algorithm = "rtcor", windowsize = 0, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp2)), getMZs(rt2))
+    rt3 <- runMetaboCombiner(list(metaboExp3, metaboExp3), algorithm = "rtcor", windowsize = 0, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp3)), getMZs(rt3))
+    rt4 <- runMetaboCombiner(list(metaboExp4, metaboExp4), algorithm = "rtcor", windowsize = 0, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp4)), getMZs(rt4))
+    
+    rt1 <- runMetaboCombiner(list(metaboExp1, metaboExp1), algorithm = "rtcor", windowsize = 0, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp1)), getMZs(rt1))
+    rt2 <- runMetaboCombiner(list(metaboExp2, metaboExp2), algorithm = "rtcor", windowsize = 0, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp2)), getMZs(rt2))
+    rt3 <- runMetaboCombiner(list(metaboExp3, metaboExp3), algorithm = "rtcor", windowsize = 0, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp3)), getMZs(rt3))
+    rt4 <- runMetaboCombiner(list(metaboExp4, metaboExp4), algorithm = "rtcor", windowsize = 0, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp4)), getMZs(rt4))
+    
+    rt1 <- runMetaboCombiner(list(metaboExp1, metaboExp1), algorithm = "rtcor", windowsize = 0, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp1)), getMZs(rt1))
+    rt2 <- runMetaboCombiner(list(metaboExp2, metaboExp2), algorithm = "rtcor", windowsize = 0, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp2)), getMZs(rt2))
+    rt3 <- runMetaboCombiner(list(metaboExp3, metaboExp3), algorithm = "rtcor", windowsize = 0, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp3)), getMZs(rt3))
+    rt4 <- runMetaboCombiner(list(metaboExp4, metaboExp4), algorithm = "rtcor", windowsize = 0, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp4)), getMZs(rt4))
+    
+}
+
+test_outputs_kmer <- function()
+{
+    data(metaboExp1)
+    data(metaboExp2)
+    data(metaboExp3)
+    data(metaboExp4)
+    
+    rt1 <- runMetaboCombiner(list(metaboExp1, metaboExp1), algorithm = "kmer", windowsize = 5, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp1)), getMZs(rt1))
+    rt2 <- runMetaboCombiner(list(metaboExp2, metaboExp2), algorithm = "kmer", windowsize = 5, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp2)), getMZs(rt2))
+    rt3 <- runMetaboCombiner(list(metaboExp3, metaboExp3), algorithm = "kmer", windowsize = 5, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp3)), getMZs(rt3))
+    rt4 <- runMetaboCombiner(list(metaboExp4, metaboExp4), algorithm = "kmer", windowsize = 5, trunc = 2)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp4)), getMZs(rt4))
+    
+    rt1 <- runMetaboCombiner(list(metaboExp1, metaboExp1), algorithm = "kmer", windowsize = 5, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp1)), getMZs(rt1))
+    rt2 <- runMetaboCombiner(list(metaboExp2, metaboExp2), algorithm = "kmer", windowsize = 5, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp2)), getMZs(rt2))
+    rt3 <- runMetaboCombiner(list(metaboExp3, metaboExp3), algorithm = "kmer", windowsize = 5, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp3)), getMZs(rt3))
+    rt4 <- runMetaboCombiner(list(metaboExp4, metaboExp4), algorithm = "kmer", windowsize = 5, ppm = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp4)), getMZs(rt4))
+    
+    rt1 <- runMetaboCombiner(list(metaboExp1, metaboExp1), algorithm = "kmer", windowsize = 5, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp1)), getMZs(rt1))
+    rt2 <- runMetaboCombiner(list(metaboExp2, metaboExp2), algorithm = "kmer", windowsize = 5, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp2)), getMZs(rt2))
+    rt3 <- runMetaboCombiner(list(metaboExp3, metaboExp3), algorithm = "kmer", windowsize = 5, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp3)), getMZs(rt3))
+    rt4 <- runMetaboCombiner(list(metaboExp4, metaboExp4), algorithm = "kmer", windowsize = 5, abs = 0)
+    checkEquals(getMZs(sortDataFrameByRt(metaboExp4)), getMZs(rt4))
+    
+}

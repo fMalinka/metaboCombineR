@@ -77,7 +77,7 @@ To verify it, we provide three functions: `getMZs`, `getRTs`,
 a vector of values corresponding to retention time.
 
 ```{r getRTs and getMZs}
-mzs <- getMZs(metaboExp1, mzprecision = 2)
+mzs <- getMZs(metaboExp1)
 rts <- getRTs(metaboExp1)
 head(mzs)
 head(rts)
@@ -86,14 +86,14 @@ head(rts)
 `sortDataFrameByRt` function returns a data.frame where rows are sorted
 by the corresponding rt values.
 ```{r sort data.frame by rt}
-sortedRTdf <- sortDataFrameByRt(metaboExp1, mzprecision = 2)
+sortedRTdf <- sortDataFrameByRt(metaboExp1)
 head(sortedRTdf)
 ```
 
 `sortDataFrameByMz` function returns a data.frame where rows are sorted
 by the corresponding mz/s values.
 ```{r sort data.frame by mz}
-sortedMZdf <- sortDataFrameByMz(metaboExp1, mzprecision = 2)
+sortedMZdf <- sortDataFrameByMz(metaboExp1)
 head(sortedMZdf)
 ```
 
@@ -105,5 +105,5 @@ experiments, `mzprecision`  expressed number of mz digits to be considered
 
 ```{r runall, eval=FALSE}
 runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4),
-mzprecision = 2, windowsize = 5)
+windowsize = 5)
 ```

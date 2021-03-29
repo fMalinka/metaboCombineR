@@ -1,8 +1,14 @@
-sortDataFrameByRt <- function(data, mzprecision=2)
+#' Sort experiment according to RT
+#' @usage sortDataFrameByRt(experiment)
+#' @param experiment an input data.frame representing experiments
+#' @return Vector of MZs
+#' @examples
+#' data(metaboExp1)
+#' sortDataFrameByRt(metaboExp1)
+sortDataFrameByRt <- function(data)
 {
-    mzprec <- 10^mzprecision
-    mzs <- trunc(as.numeric(regmatches(rownames(data),
-    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec
+    mzs <- as.numeric(regmatches(rownames(data),
+           regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))
     
     rts <- as.numeric(substring(regmatches(rownames(data),
     regexpr("T\\d+(\\.\\d+)?",rownames(data), perl=TRUE)),2))
@@ -11,59 +17,50 @@ sortDataFrameByRt <- function(data, mzprecision=2)
     return(as.matrix(newdata))
 }
 
-sortDataFrameByMz <- function(data, mzprecision=2)
+#' Sort experiment according to MZ
+#' @usage sortDataFrameByMz(experiment)
+#' @param experiment an input data.frame representing experiments
+#' @return Data.frame sorted according to MZs
+#' @examples
+#' data(metaboExp1)
+#' sortDataFrameByMz(metaboExp1)
+sortDataFrameByMz <- function(data)
 {    
-    mzprec <- 10^mzprecision
-    mzs <- trunc(as.numeric(regmatches(rownames(data),
-    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec
+    mzs <- as.numeric(regmatches(rownames(data),
+    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))
     
     mzsOrder <- order(mzs)
     newdata <- data[mzsOrder,]
     return(as.matrix(newdata))
 }
 
+#' Get vector of RT
+#' @usage getRTs(experiment)
+#' @param experiment an input data.frame representing experiments
+#' @return Vector of RTs
+#' @examples
+#' data(metaboExp1)
+#' getRTs(metaboExp1)
 getRTs <- function(data)
 {
     return(as.numeric(substring(regmatches(rownames(data),
     regexpr("T\\d+(\\.\\d+)?",rownames(data), perl=TRUE)),2)))
 }
 
-getMZs <- function(data, mzprecision=2)
+#' Get vector of MZ
+#' @usage getMZs(experiment)
+#' @param experiment an input data.frame representing experiments
+#' @return Vector of MZs
+#' @examples
+#' data(metaboExp1)
+#' getMZs(metaboExp1)
+getMZs <- function(data)
 {
-    mzprec <- 10^mzprecision
-    return(as.numeric(trunc(as.numeric(regmatches(rownames(data),
-    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec))
+    return(as.numeric(regmatches(rownames(data),
+          regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE))))
 }
 
-sortMzByRt <- function(data, mzprecision=2)
-{
-    mzprec <- 10^mzprecision
-    mzs <- trunc(as.numeric(regmatches(rownames(data),
-    regexpr("\\d+(\\.\\d+)?",rownames(data), perl=TRUE)))*mzprec)/mzprec
-    rts <- as.numeric(substring(regmatches(rownames(data),
-    regexpr("T\\d+(\\.\\d+)?",rownames(data), perl=TRUE)),2))  
-    rtsOrder <- order(rts)
-    newdata <- data[rtsOrder,]
-    newdata <- cbind(newdata, RT= rts[rtsOrder])
-    newdata <- cbind(newdata, MZ= mzs[rtsOrder])
-    return(as.matrix(newdata))
-}
-
-prepareExperiments <- function(listOfExperiment, listOfISindexes)
-{
-    allExps <- list()
-    allIS <- list()
-    i <- 1
-    for(exp in listOfExperiment)
-    {
-        allExps <- append(allExps, list(sortMzByRt(exp)))
-        allIS <- append(allIS, list(listOfISindexes[[i]]))
-        i <- i + 1
-    }
-    return(list(experiments = allExps, ISindexes = allIS))
-}
-
-#check List
+#check for valid format of input
 isValid <- function(dataframe)
 {
     mzs <- rownames(dataframe)
@@ -75,9 +72,38 @@ isValid <- function(dataframe)
     return(rownameFormat & valueFormat & rowDim & colDim)
 }
 
-
-runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, algorithm="kmer")
+#' Run metaboCombineR
+#' @usage runMetaboCombiner(listExperimens, windowsize, algorithm, trunc)
+#' @param listExperimens a list of data.frames representing experiments
+#' @param windowsize a number indicating window size parameter for 'rtcor', or k-mer size for 'k-mer' algorithm.
+#' @param algorithm a string, 'rtcor' or 'kmer' algorithm
+#' @param ppm a relative value of m/z difference for the peak/feature matching
+#' @param abs an absolute value of m/z difference for the peak/feature matching
+#' @param trunc a number of decimal places to be truncated for m/z peak/feature matching
+#' @param s_match a score for matched features, in an alignment problem (default: 100)
+#' @param s_del a penalization for deletion of features, in an alignment problem (default: 1)
+#' @param s_ins a penalization for insertion of features, in an alignment problem (default: 1)
+#' @param mzres reported mz values reported in pairwise alignment according to reference (ref), non-reference (nonref) experiments, or its average (avg). (default: avg)
+#' @return Data.frame of final matrix
+#' @details Only one parameter of 'ppm', 'abs', or 'trunc' can be specified.
+#' @examples
+#' data(metaboExp1)
+#' data(metaboExp2)
+#' data(metaboExp3)
+#' data(metaboExp4)
+#' runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4), algorithm = "kmer", trunc = 2)
+runMetaboCombiner <- function(listExperimens, windowsize = 5, algorithm="kmer", ppm = -1, abs = -1, trunc = -1, s_match = 100, s_del = 1, s_ins = 1, mzres = "avg")
 {
+    matchMode <- NULL
+    matchValue <- 0
+    if(class(listExperimens) != "list")
+    {
+        stop("Argument \"listExperimens\" is not a List!")
+    }
+    if(length(listExperimens) == 0)
+    {
+        stop("List \"listExperimens\" does not contain any experiments!")
+    }
     if(algorithm == "rtcor")
     {
         write(paste0("Algorithm: rtcorrectedAlignment"), stdout())
@@ -92,6 +118,73 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, a
         algorithm="kmer"
         message("Algorithm: kmersAlignment")
     }
+    if(!is.numeric(ppm) | !is.numeric(abs) | !is.numeric(trunc))
+    {
+        stop("ppm, abs, and trunc parameters must be numeric!")
+    }
+    
+    if(sum(c(ppm >= 0,  abs >= 0 , trunc >= 0)) >= 2)
+    {
+        stop("Only one parameter of ppm, abs, or trunc can be set up!")
+    } 
+    
+    if(mzres != "ref" & mzres != "nonref" & mzres != "avg")
+    {
+        stop("Only values ref, nonref, or avg are supported for mzres!")
+    }
+    
+    if(ppm != -1)
+    {
+        if(ppm >= 0)
+        {
+            if(is.null(matchMode))
+            {
+                matchMode <- "ppm"
+                matchValue <- ppm
+                write(paste0("ppm: ", ppm), stdout())
+                } else {
+                    stop("Only one parameter of ppm, abs, or trunc can be set up!")
+                }
+        } else
+        {
+            stop("ppm parameter must be > 0!")
+        }
+    } else if(abs != -1)
+    {
+        if(abs >= 0)
+        {
+            if(is.null(matchMode))
+            {
+                matchMode <- "abs"
+                matchValue <- abs
+                write(paste0("abs: ", abs), stdout())
+                } else {
+                    stop("Only one parameter of ppm, abs, or trunc can be set up!")
+                }
+        } else
+        {
+            stop("abs parameter must be > 0!")
+        }
+    } else if(trunc != -1)
+    {
+        if(trunc >= 0)
+        {
+            if(is.null(matchMode))
+            {
+                matchMode <- "trunc"
+                matchValue <- trunc
+                write(paste0("trunc: ", trunc), stdout())
+                } else {
+                    stop("Only one parameter of ppm, abs, or trunc can be set up!")
+                }
+        } else
+        {
+            stop("trunc parameter must be > 0!")
+        }
+    } else
+    {
+        stop("At least one of ppm, abs, or trunc parameters must be set up correctly!")
+    }
     myclass <- new(metaboCombineR)
     ilist  <- 1
     isGroup <- rep(FALSE, length(listExperimens))
@@ -99,6 +192,10 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, a
     listGroup <- vector(mode = "list", length = length(listExperimens))
     for(elist in listExperimens)
     {
+        if(nrow(elist) == 0)
+        {
+            stop(paste0("List n. ", ilist, " has 0 rows!"))
+        }
       #group row present
         if(grepl("group", rownames(elist)[1], ignore.case=TRUE))
         {
@@ -120,15 +217,13 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, a
         }
         else
         {
-            write(paste0("experiment n.", ilist, ". Format seems INVALID."),
-                stderr())
+            stop(paste0("experiment n.", ilist, ". Format seems INVALID."))
         }
         ilist <- ilist + 1
     }
     if(!(all(isGroup)|(all(!isGroup))))
     {
-        write(paste0("There are inconsistencies in GROUP labels. The GROUP label is missing in experiments no. ", paste0(which(isGroup == FALSE), collapse=","), "."),
-              stderr())
+        stop(paste0("There are inconsistencies in GROUP labels. The GROUP label is missing in experiments no. ", paste0(which(isGroup == FALSE), collapse=","), "."))
     }
     else if(all(listValid))
     {
@@ -136,22 +231,20 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, a
         {
 			if(windowsize <=3 | windowsize >= min(sapply(listExperimens, nrow)))
 			{
-				write(paste0("ERROR: windowsize parameter is out of range!"), stderr())
-		        finalmatrix  <- NULL
+			    stop("ERROR: windowsize parameter is out of range!")
 			} else
 			{
-            	finalmatrix <- myclass$run(listExperimens, mzprecision, windowsize)
+			    finalmatrix <- myclass$runKmersAlignment(listExperimens, matchValue, windowsize, matchMode, s_match, s_del, s_ins, mzres)
 			}
         }
         else
         {
-			if(windowsize <=1 | windowsize >= min(sapply(listExperimens, nrow)))
+			if(windowsize < 0 | windowsize >= min(sapply(listExperimens, nrow)))
 			{
-				write(paste0("ERROR: windowsize parameter is out of range!"), stderr())
-		        finalmatrix  <- NULL
+			    stop("ERROR: windowsize parameter is out of range!")
 			} else
 			{
-            	finalmatrix <- myclass$runRT(listExperimens, mzprecision, windowsize)
+			    finalmatrix <- myclass$runRtcorrectedAlignment(listExperimens, matchValue, windowsize, matchMode, s_match, s_del, s_ins, mzres)
 			}
         }
         
@@ -163,47 +256,8 @@ runMetaboCombiner <- function(listExperimens, mzprecision = 2, windowsize = 5, a
     }
     else
     {
-        write(paste0("ERROR: Check INPUT files!"), stderr())
-        finalmatrix  <- NULL
+        stop("ERROR: Check INPUT files!")
     }
     rm(myclass)
     return(finalmatrix)
-}
-
-correctClassiqAling2 <- function(mzvect1, mzvect2, orderLimit = 50)
-{
-  swapIndex1 <- vector()
-  swapIndex2 <- vector()
-  i <- 1
-  for(vect1 in mzvect1)
-  {
-    refind <- which(c(mzvect1[i], mzvect2[i]) == "-1")
-    if(length(refind) == 1)
-    {
-      if(refind == 1)
-      {
-        if(mzvect2[i] %in% mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
-        {
-          #thesameInd <- which(mzvect2[i] == mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])
-            thesameInd <- which(mzvect2[i] == mzvect1[(i+1):min((i+orderLimit), length(mzvect1))])[1]
-          mzvect1[thesameInd + i] <- "-1"
-          swapIndex2 <- append(swapIndex2, i)
-          swapIndex1 <- append(swapIndex1, thesameInd + i)
-        }
-      }
-      if(refind == 2)
-      {
-        if(mzvect1[i] %in% mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
-        {
-          #thesameInd <- which(mzvect1[i] == mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])
-            thesameInd <- which(mzvect1[i] == mzvect2[(i+1):min((i+orderLimit), length(mzvect2))])[1]
-          mzvect2[thesameInd + i] <- "-1"
-          swapIndex2 <- append(swapIndex2, thesameInd + i)
-          swapIndex1 <- append(swapIndex1, i)
-        }
-      }
-    }
-    i <- i + 1
-  }
-  return(list(swapIndex1, swapIndex2))
 }
