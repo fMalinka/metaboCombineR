@@ -59,6 +59,8 @@ mytableRtcor <- runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metab
 ```
 Then, the result matrix is stored in `mytableKmer`, `mytableRtcor` variable respectively.
 
+
+For more detail, see the manual page typing
 ```
 ?runMetaboCombiner
 ```
