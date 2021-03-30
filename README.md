@@ -22,9 +22,15 @@ data(metaboExp2)
 data(metaboExp3)
 data(metaboExp4)
 ```
-Presented datasets are in 2-dimensional matrix format where rows represent features and each row has it own name which m/z value is prefixed by `M` and rt by `T`. Columns represent samples. Names of all samples/features must be filled by `colnames`/`rownames` function through R. To see an example of dataset format, type `head(metaboExp1)`.
+Presented datasets are in 2-dimensional matrix format where rows represent features and each row has it own name in which m/z values are prefixed by `M` and rt by `T`. Columns represent samples. Names of all samples/features must be filled by `colnames`/`rownames` function through R. To see an example of dataset format, type `head(metaboExp1)`.
 
-MetaboCombineR enables to define assignments of samples to some group, typically as treatment and control groups. To provide this information, add a vector of assignments as the first row to the input `data.frame`. The row must be named as `group`. If the group label is present in a dataset it must be present in all other datasets. Inconsistencies are not allowed. An example of dataset with three samples (two treatments and one control) and 2 features is depicted below.
+| | X064.EPK83_m_Mzb1_ESI.mzML | X064.EPK88_m_Mzb1_ESI.mzML | X064.EPK94_m_Mzb1_ESI.mzML |
+|---|---|---|---|
+| M57.08131T1428.18786 | -0.321542424867644 | 0.286250559905367 | 1.17078411764221 |
+| M57.23559T1428.09065 | 0.408813652123444 | -1.0100177456997 | -0.153473421445439 |
+
+
+MetaboCombineR enables to define assignments of samples to some group, typically as treatment and control groups. To provide this information, add a vector of assignments as the first row to the input `data.frame`. The row must be named as `group`. If the group label is present in at least one dataset then it must be present in all other datasets. Inconsistencies are not allowed. An example of dataset with three samples (two treatments and one control) and 2 features is depicted below.
 
 
 | | X064.EPK83_m_Mzb1_ESI.mzML | X064.EPK88_m_Mzb1_ESI.mzML | X064.EPK94_m_Mzb1_ESI.mzML |
@@ -34,12 +40,28 @@ MetaboCombineR enables to define assignments of samples to some group, typically
 | M57.23559T1428.09065 | 0.408813652123444 | -1.0100177456997 | -0.153473421445439 |
 
 
-To combine all of these experiments into one table, call `runMetaboCombiner` function, where the first arguments is supposed to be a list of experiments, `mzprecision` argument defines a number of digits considered for peaks, and `algorithm` selects one of the proposed algorithms. The `algorithm` argument supposes only two values on input: kmer and rtcor. The default algorithm is kmersAlignment. `windowsize` argument represents the size of the window for `rtcorrectedAlignment` algorithm. For `kmersAlignment` algorithm, the same argument represents the k-mer value.
+To combine all of these experiments into one table, call `runMetaboCombiner` function. Usage of the function is the following:
+
 ```
-mytableKmer <- runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4), mzprecision = 2, algorithm="kmer", windowsize = 5)
-mytableRtcor <- runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4), mzprecision = 2, algorithm="rtcor", windowsize = 50)
+runMetaboCombiner(listExperimens, windowsize, algorithm, trunc)
+```
+
+where the first arguments is `listExperimens` supposed to be a list of experiments in the proper format described above. `algorithm` selects one of the proposed algorithms, supposes only two values: "kmer"" and "rtcor". The default algorithm is `kmersAlignment`. According to the `algorithm` argument, `windowsize` argument represents the size of the window for `rtcorrectedAlignment` algorithm or `k` value of k-mer for `kmersAlignment` algorithm. 	
+`trunc` represents a total number of decimal places to be truncated for m/z feature matching. For feature matching, the package provides two other options: ppm or abs. For more detail, type `?runMetaboCombiner`.
+
+A few running examples with different parameter values are listed below.
+```
+mytableKmer <- runMetaboCombiner(list(metaboExp1, metaboExp2), algorithm="kmer", windowsize = 5, trunc = 2)
+mytableKmer <- runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4), algorithm="kmer", windowsize = 5, ppm = 20)
+
+mytableRtcor <- runMetaboCombiner(list(metaboExp1, metaboExp2), algorithm="rtcor", windowsize = 50, trunc = 2)
+mytableRtcor <- runMetaboCombiner(list(metaboExp1, metaboExp2, metaboExp3, metaboExp4), algorithm="rtcor", windowsize = 50, ppm = 20)
 ```
 Then, the result matrix is stored in `mytableKmer`, `mytableRtcor` variable respectively.
+
+```
+?runMetaboCombiner
+```
 
 ## Authors
 
